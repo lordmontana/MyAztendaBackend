@@ -1,0 +1,95 @@
+using EmployeeService.DTOs;
+using EmployeeService.Models;
+using EmployeeService.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Shared.Repositories;
+
+namespace EmployeeService.Controllers;
+
+[Authorize] 
+[ApiController]
+[Route("api/[controller]")]
+public class EmployeesController : ControllerBase
+{
+    private readonly ILogger<EmployeesController> _logger;
+    private readonly ApplicationDbContext _context;
+
+    public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context)
+    {
+        _logger = logger;
+        _context = context;
+    }
+
+
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var repo = new Repository<Employee>(_context);
+        var items = await repo.GetAllAsync();
+        return Ok(items);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+
+        var repo = new Repository<Employee>(_context);
+        var item = await repo.GetByIdAsync(id);
+        return item is null ? NotFound() : Ok(item);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(EmployeeDto dto)
+    {
+
+        var repo = new Repository<Employee>(_context);
+
+        var employee = new Employee
+        {
+            Name = dto.Name,
+            Gender = dto.Gender,
+        };
+
+        await repo.AddAsync(employee);
+        await repo.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetById), new { id = employee.Id }, employee);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, EmployeeDto dto)
+    {
+
+        var repo = new Repository<Employee>(_context);
+
+        var employee = await repo.GetByIdAsync(id);
+        if (employee is null) return NotFound(); 
+
+        if (!string.IsNullOrWhiteSpace(dto.Name)) employee.Name = dto.Name;
+        if (!string.IsNullOrWhiteSpace(dto.Gender)) employee.Gender = dto.Gender;
+
+
+        repo.Update(employee);
+        await repo.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+
+        var repo = new Repository<Employee>(_context);
+
+        var employee = await repo.GetByIdAsync(id);
+        if (employee is null) return NotFound();
+
+        repo.Delete(employee);
+        await repo.SaveChangesAsync();
+
+        return NoContent();
+    }
+}

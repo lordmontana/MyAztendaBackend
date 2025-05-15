@@ -1,0 +1,20 @@
+{
+    "Routes": [
+        {
+            "DownstreamPathTemplate": "/api/employees",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "employeeservice",
+                    "Port": 80
+                }
+            ],
+            "UpstreamPathTemplate": "/employees",
+            "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+            "LoadBalancerOptions": { "Type": "RoundRobin" }
+        }
+    ],
+    "GlobalConfiguration": {
+        "BaseUrl": "http://services.gateway:9500"
+    }
+}

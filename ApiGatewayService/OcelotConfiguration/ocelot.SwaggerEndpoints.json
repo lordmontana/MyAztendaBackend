@@ -1,0 +1,69 @@
+{
+  "SwaggerEndPoints": [
+    {
+      "Key": "location",
+      "Config": [
+        {
+          "Name": "Location Web API",
+          "Version": "v1",
+          "Service": {
+            "Name": "location",
+            "Path": "/swagger/v1/swagger.json"
+          }
+        }
+      ]
+    },
+    {
+      "Key": "ticketing",
+      "Config": [
+        {
+          "Name": "Ticketing Web API",
+          "Version": "v1",
+          "Service": {
+            "Name": "ticketing",
+            "Path": "/swagger/v1/swagger.json"
+          }
+        }
+      ]
+    },
+    {
+      "Key": "Customer",
+      "Config": [
+        {
+          "Name": "Customer Web API",
+          "Version": "v1",
+          "Service": {
+            "Name": "customer",
+            "Path": "/swagger/v1/swagger.json"
+          }
+        }
+      ]
+    },
+    {
+      "Key": "product",
+      "Config": [
+        {
+          "Name": "Product Web API",
+          "Version": "v1",
+          "Service": {
+            "Name": "product",
+            "Path": "/swagger/v1/swagger.json"
+          }
+        }
+      ]
+    },
+    {
+      "Key": "Employee",
+      "Config": [
+        {
+          "Name": "Employee Web API",
+          "Version": "v1",
+          "Service": {
+            "Name": "employee",
+            "Path": "/swagger/v1/swagger.json"
+          }
+        }
+      ]
+    }
+  ]
+}

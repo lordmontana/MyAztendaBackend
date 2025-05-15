@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option csharp_namespace = "EmployeeLocationService";
+
+// The service definition for EmployeeLocation
+service EmployeeLocationGRPC {
+  // RPC to get all locations
+  rpc GetLocations (EmptyRequest) returns (LocationList);
+
+  // RPC to get a location by ID
+  rpc GetLocationById (LocationRequest) returns (Location);
+}
+
+// Request message for getting a location by ID
+message LocationRequest {
+  int32 id = 1; // ID of the location
+}
+
+// Empty request message for fetching all locations
+message EmptyRequest {}
+
+// The Location message structure
+message Location {
+  int32 id = 1;         // ID of the location
+  string name = 2;      // Name of the location
+  string region = 3;    // Region of the location
+  int32 clientId = 4;   // Client ID associated with the location
+}
+
+// The response message containing a list of locations
+message LocationList {
+  repeated Location locations = 1; // List of locations
+}

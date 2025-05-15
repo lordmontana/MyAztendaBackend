@@ -1,0 +1,18 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/{everything}",
+      "ServiceName": "Employee",
+      "UpstreamPathTemplate": "/employee-gate/{everything}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "RequireHttps": false
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Token}"
+      },
+      "SwaggerKey": "Employee"
+    }
+  ]
+}
