@@ -2,16 +2,16 @@ version: '3.8'
 
 services:
   # SQL Server Database
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrong!Password
-    ports:
-      - "1433:1433"
-    networks:
-      - microservices-network
+#  sqlserver:
+#    image: mcr.microsoft.com/mssql/server:2022-latest
+#    container_name: sqlserver
+#    environment:
+#      - ACCEPT_EULA=Y
+#      - SA_PASSWORD=YourStrong!Password
+#    ports:
+#      - "1433:1433"
+#    networks:
+#      - microservices-network
 
   # Employee Service
   employeeservice:
@@ -24,8 +24,8 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=EmployeeDb;User=sa;Password=YourStrong!Password;
     ports:
       - "5001:80"
-    depends_on:
-      - sqlserver
+   # depends_on:
+  #    - sqlserver
     networks:
       - microservices-network
 
@@ -40,8 +40,8 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=LocationDb;User=sa;Password=YourStrong!Password;
     ports:
       - "5002:80"
-    depends_on:
-      - sqlserver
+   # depends_on:
+   #   - sqlserver
     networks:
       - microservices-network
 
@@ -56,8 +56,8 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ProductDb;User=sa;Password=YourStrong!Password;
     ports:
       - "5003:80"
-    depends_on:
-      - sqlserver
+  #  depends_on:
+  #    - sqlserver
     networks:
       - microservices-network
 
@@ -72,8 +72,8 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=CustomerDb;User=sa;Password=YourStrong!Password;
     ports:
       - "5004:80"
-    depends_on:
-      - sqlserver
+ #   depends_on:
+ #     - sqlserver
     networks:
       - microservices-network
   # Auth Service
@@ -87,8 +87,8 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AuthDb;User=sa;Password=YourStrong!Password;
     ports:
       - "5005:80"
-    depends_on:
-      - sqlserver
+  #  depends_on:
+  #    - sqlserver
     networks:
       - microservices-network
 
@@ -103,8 +103,8 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AuthDb;User=sa;Password=YourStrong!Password;
     ports:
       - "5006:80"
-    depends_on:
-      - sqlserver
+#   depends_on:
+#     - sqlserver
     networks:
       - microservices-network
     
@@ -119,8 +119,8 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AuthDb;User=sa;Password=YourStrong!Password;
     ports:
       - "5007:80"
-    depends_on:
-      - sqlserver
+ #   depends_on:
+ #     - sqlserver
     networks:
       - microservices-network
 

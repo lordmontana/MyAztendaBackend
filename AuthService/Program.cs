@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add DbContext for Identity and your Application DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -46,6 +46,8 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = "localhost:6379"; // Redis server address, replace with your Redis server URL if using cloud Redis
     options.InstanceName = "AuthService:";
 });
+
+
 
 // Add Controllers
 builder.Services.AddControllers();

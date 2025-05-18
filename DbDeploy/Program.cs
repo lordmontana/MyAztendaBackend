@@ -1,12 +1,23 @@
 ﻿using DbUp;
 using System;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 
 class Program
 {
 	static int Main(string[] args)
 	{
-		var connectionString = "Server=localhost;Database=AztendaDb;Trusted_Connection=True;";
+		//var connectionString = "Server=DESKTOP-HBBGGUN;Database=MyAtzenda;User Id=sa;Password=as;Connection Timeout=30;Encrypt=False;";
+		//"DefaultConnection": "Server=DESKTOP-HBBGGUN;Database=MyAtzenda;User Id=sa;Password=as;Connection Timeout=30;Encrypt=False;"
+
+		var configuration = new ConfigurationBuilder()
+	   .SetBasePath(AppContext.BaseDirectory)
+	   .AddJsonFile("appsettings.json", optional: false)
+	   .Build();
+
+		var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+
 
 		var upgrader = DeployChanges.To
 			.SqlDatabase(connectionString)
