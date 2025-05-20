@@ -1,14 +1,20 @@
-using AuthService;
 using AuthService.Persistence;
+using AuthService.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration
+	.AddJsonFile("appsettings.json", optional: false)
+	.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+	.AddEnvironmentVariables();
+
+
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Add DbContext for Identity and your Application DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -19,6 +25,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+    
+
+
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -27,15 +36,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.Authority = "https://localhost:5000"; // Your IdentityServer URL
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = false,
-            ValidateIssuer = false,
-            ValidateIssuerSigningKey = false,
-            ValidateLifetime = false,
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
-            RequireExpirationTime = false,
-            // Ensure the key is at least 128 bits long
-
-            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["Jwt:SecretKey"])) // Base64 128-bit key
+            RequireExpirationTime = true,
+			ValidIssuer = builder.Configuration["Jwt:Issuer"],
+			ValidAudience = builder.Configuration["Jwt:Audience"],
+			// Ensure the key is at least 128 bits long
+			IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["Jwt:SecretKey"])) // Base64 128-bit key
         };
     });
 
@@ -58,6 +68,7 @@ builder.Services.AddSwaggerGen();
 builder.WebHost.UseUrls("http://*:80");
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

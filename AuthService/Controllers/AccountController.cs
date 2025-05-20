@@ -1,4 +1,5 @@
 using AuthService.Persistence;
+using AuthService.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -19,13 +20,15 @@ namespace AuthService.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly IDistributedCache _cache;
+		private readonly ITokenService _tokenService;
 
-        public AccountController( IDistributedCache cache, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+		public AccountController( IDistributedCache cache, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration,ITokenService tokenService)
         {
             _cache = cache;
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _tokenService = tokenService;
         }
 
         // Register endpoint
@@ -63,8 +66,9 @@ namespace AuthService.Controllers
             return BadRequest(result.Errors);
         }
 
-        // Login endpoint
-        [HttpPost("login")]
+
+		// Login endpoint
+		[HttpPost("login")]
 
         public async Task<string> Login(string username, string password)
         {
@@ -78,28 +82,29 @@ namespace AuthService.Controllers
                 throw new Exception("Invalid credentials.");
 
             // Generate the JWT token
-            var token = GenerateJwtToken(user);
+          //  var token = GenerateJwtToken(user);
+			var token = _tokenService.GenerateJwtToken(user);
 
-            #region Enable When Redis Server Available
+			#region Enable When Redis Server Available
 
-            //var authService = new AuthService();
-            //// Store the session info in Redis
+			//var authService = new AuthService();
+			//// Store the session info in Redis
 
-            //authService.StoreJwtTokenInRedis(user.Id, token); 
-            // Store in Redis with an expiration time
+			//authService.StoreJwtTokenInRedis(user.Id, token); 
+			// Store in Redis with an expiration time
 
 
-            #endregion
-            return token; // Return the token for the user
+			#endregion
+			return token; // Return the token for the user
         }
         private string GenerateJwtToken(ApplicationUser user)
         {
             var secretKey = _configuration["Jwt:SecretKey"];
             var claims = new[]
             {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+                  new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                  new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+              };
 
             var key = new SymmetricSecurityKey(Convert.FromBase64String(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
