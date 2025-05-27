@@ -24,7 +24,10 @@ builder.Services.AddGrpc();
 // Map the gRPC service
 #endregion
 
-builder.WebHost.UseUrls("http://*:80");
+if (builder.Environment.EnvironmentName == "Docker")
+{
+	builder.WebHost.UseUrls("http://*:80");
+}
 var app = builder.Build();
 
 app.MapGrpcService<EmployeeLocationServiceImp>();

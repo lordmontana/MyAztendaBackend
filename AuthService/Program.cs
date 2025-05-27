@@ -65,7 +65,10 @@ builder.Services.AddControllers();
 // Add Swagger services
 builder.Services.AddSwaggerGen();
 
-builder.WebHost.UseUrls("http://*:80");
+if (builder.Environment.EnvironmentName == "Docker")
+{
+	builder.WebHost.UseUrls("http://*:80");
+}
 
 var app = builder.Build();
 

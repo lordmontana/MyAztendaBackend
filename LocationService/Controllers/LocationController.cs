@@ -25,9 +25,22 @@ public class LocationsController : ControllerBase
 	[HttpGet]
 	public async Task<IActionResult> GetAll()
 	{
-		var repo = new Repository<Location>(_context);
-		var items = await repo.GetAllAsync();
-		return Ok(items);
+		try
+		{
+			var repo = new Repository<Location>(_context);
+			var items = await repo.GetAllAsync();
+			return Ok(items);
+		}
+		catch (Exception ex)
+		{
+			// You can log here, too (e.g., to file, Grafana Loki, etc.)
+			return StatusCode(500, new
+			{
+				message = "An error occurred while retrieving data.",
+				error = ex.Message,        // Optional: return ex.StackTrace for full trace
+				type = ex.GetType().Name
+			});
+		}
 	}
 
 	[HttpGet("{id}")]

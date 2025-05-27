@@ -21,7 +21,7 @@ services:
     container_name: employeeservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=EmployeeDb;User=sa;Password=YourStrong!Password;
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=MyAtzenda;User Id=sa;Password=as;Connection Timeout=30;Encrypt=False;;
     ports:
       - "5001:80"
    # depends_on:
@@ -37,7 +37,7 @@ services:
     container_name: locationservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=LocationDb;User=sa;Password=YourStrong!Password;
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=MyAtzenda;User Id=sa;Password=as;Connection Timeout=30;Encrypt=False;;
     ports:
       - "5002:80"
    # depends_on:
@@ -53,7 +53,7 @@ services:
     container_name: productservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ProductDb;User=sa;Password=YourStrong!Password;
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=MyAtzenda;User Id=sa;Password=as;Connection Timeout=30;Encrypt=False;;
     ports:
       - "5003:80"
   #  depends_on:
@@ -69,7 +69,7 @@ services:
     container_name: customerservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=CustomerDb;User=sa;Password=YourStrong!Password;
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=MyAtzenda;User Id=sa;Password=as;Connection Timeout=30;Encrypt=False;;
     ports:
       - "5004:80"
  #   depends_on:
@@ -84,7 +84,7 @@ services:
     container_name: authservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AuthDb;User=sa;Password=YourStrong!Password;
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=MyAtzenda;User Id=sa;Password=as;Connection Timeout=30;Encrypt=False;;
     ports:
       - "5005:80"
   #  depends_on:
@@ -100,7 +100,7 @@ services:
     container_name: apigatewayservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AuthDb;User=sa;Password=YourStrong!Password;
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=MyAtzenda;User Id=sa;Password=as;Connection Timeout=30;Encrypt=False;;
     ports:
       - "5006:80"
 #   depends_on:
@@ -116,7 +116,7 @@ services:
     container_name: ticketingservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AuthDb;User=sa;Password=YourStrong!Password;
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=MyAtzenda;User Id=sa;Password=as;Connection Timeout=30;Encrypt=False;;
     ports:
       - "5007:80"
  #   depends_on:

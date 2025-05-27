@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
 using MMLib.Ocelot.Provider.AppConfiguration;
 using MMLib.SwaggerForOcelot.DependencyInjection;
 using Ocelot.DependencyInjection;
@@ -14,6 +15,8 @@ builder.Configuration.AddOcelotWithSwaggerSupport(options =>
 builder.Services.AddOcelot(builder.Configuration).AddAppConfiguration();
 builder.Services.AddSwaggerForOcelot(builder.Configuration);
 #endregion
+
+builder.Logging.AddConsole();
 
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -62,9 +65,40 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+	options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+	{
+		In = ParameterLocation.Header,
+		Description = "Please enter token",
+		Name = "Authorization",
+		Type = SecuritySchemeType.Http,
+		BearerFormat = "JWT",
+		Scheme = "bearer"
+	});
 
-builder.WebHost.UseUrls("http://*:80");
+	options.AddSecurityRequirement(new OpenApiSecurityRequirement
+	{
+		{
+			new OpenApiSecurityScheme
+			{
+				Reference = new OpenApiReference
+				{
+					Type = ReferenceType.SecurityScheme,
+					Id = "Bearer"
+				}
+			},
+			Array.Empty<string>()
+		}
+	});
+});
+
+
+if (builder.Environment.EnvironmentName == "Docker")
+{
+	builder.WebHost.UseUrls("http://*:80");
+}
+
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");

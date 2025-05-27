@@ -21,7 +21,10 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.WebHost.UseUrls("http://*:80");
+if (builder.Environment.EnvironmentName == "Docker")
+{
+	builder.WebHost.UseUrls("http://*:80");
+}
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

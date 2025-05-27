@@ -19,6 +19,31 @@ builder.Services.AddSwaggerGen(c =>
         Title = "Employee",
         Version = "v1"
     });
+
+	c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+	{
+		In = ParameterLocation.Header,
+		Description = "Please enter token",
+		Name = "Authorization",
+		Type = SecuritySchemeType.Http,
+		BearerFormat = "JWT",
+		Scheme = "Bearer"
+	});
+
+	c.AddSecurityRequirement(new OpenApiSecurityRequirement
+	{
+		{
+			new OpenApiSecurityScheme
+			{
+				Reference = new OpenApiReference
+				{
+					Type = ReferenceType.SecurityScheme,
+					Id = "Bearer"
+				}
+			},
+			Array.Empty<string>()
+		}
+	});
 });
 
 // Add authentication services
@@ -67,8 +92,10 @@ builder.Services.AddSingleton(provider =>
 
 #endregion
 
-builder.WebHost.UseUrls("http://*:80");
-
+if (builder.Environment.EnvironmentName == "Docker")
+{
+	builder.WebHost.UseUrls("http://*:80");
+}
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -77,7 +104,7 @@ var app = builder.Build();
 
     app.UseSwagger(c =>
     {
-        c.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi2_0;
+        c.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0;
     });
     //app.UseSwaggerUI();
     app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "employee"); });
