@@ -1,4 +1,6 @@
+using ApiGatewayService.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MMLib.Ocelot.Provider.AppConfiguration;
 using MMLib.SwaggerForOcelot.DependencyInjection;
@@ -41,25 +43,37 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "Ocelot:"; // Optional instance name
 });
 
-// Configure JWT Authentication
+
+
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "https://localhost:5000"; // Your IdentityServer URL
-        options.Audience = "https://localhost:5000";  // Your Audience
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
+	.AddJwtBearer("Bearer", options =>
+	{
+		options.TokenValidationParameters = new TokenValidationParameters
+		{
+			ValidateIssuer = true,
+			ValidIssuer = jwtSettings.Issuer,          // Must match the `iss` in the token
 
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+			ValidateAudience = true,
+			ValidAudience = jwtSettings.Audience,      // Must match the `aud` in the token
 
+			ValidateIssuerSigningKey = true,
+			IssuerSigningKey = new SymmetricSecurityKey(
+				Convert.FromBase64String(jwtSettings.SecretKey)), // Must match the signing key used by AuthService
 
+			ValidateLifetime = true,
+			ClockSkew = TimeSpan.Zero
+		};
+
+		options.Events = new JwtBearerEvents
+		{
+			OnAuthenticationFailed = context =>
+			{
+				Console.WriteLine($"[OCELOT JWT FAIL]: {context.Exception.Message}");
+				return Task.CompletedTask;
+			}
+		};
+	});
 
 builder.Services.AddRazorPages();
 

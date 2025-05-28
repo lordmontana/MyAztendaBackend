@@ -1,5 +1,6 @@
 using EmployeeService.Persistence;
 using EmployeeService.Services;
+using EmployeeService.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -47,33 +48,42 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Add authentication services
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "https://localhost:5001"; // The URL of your AuthService (IdentityServer)
-        options.Audience = "https://localhost:5001"; // The audience of the AuthService tokens
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateAudience = false,
-            ValidateIssuer = false,
-            ValidateIssuerSigningKey = false,
-            ValidateLifetime = false,
-            ClockSkew = TimeSpan.Zero,
-            RequireExpirationTime = false,
-        };
-        // Event for debugging authentication failure
-        options.Events = new JwtBearerEvents
-        {
-            OnAuthenticationFailed = context =>
-            {
-                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
-                return Task.CompletedTask;
-            }
-        };
-    });
+	.AddJwtBearer("Bearer", options =>
+	{
+		options.TokenValidationParameters = new TokenValidationParameters
+		{
+			ValidateIssuer = true,
+			ValidIssuer = jwtSettings.Issuer,
+
+			ValidateAudience = true,
+			ValidAudience = jwtSettings.Audience,
+
+			ValidateIssuerSigningKey = true,
+			IssuerSigningKey = new SymmetricSecurityKey(
+				Convert.FromBase64String(jwtSettings.SecretKey)),
+
+			ValidateLifetime = true,
+			ClockSkew = TimeSpan.Zero
+		};
+
+		options.Events = new JwtBearerEvents
+		{
+			OnAuthenticationFailed = context =>
+			{
+				Console.WriteLine($"[EMPLOYEE AUTH FAILED]: {context.Exception.Message}");
+				return Task.CompletedTask;
+			}
+		};
+	});
+
+builder.Services.AddAuthorization();
+
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 #region GRPC
 builder.Services.AddScoped<EmployeeGRPCClientService>(provider =>

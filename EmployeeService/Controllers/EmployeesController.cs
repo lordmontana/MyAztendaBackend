@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using EmployeeService.DTOs;
 using EmployeeService.Models;
 using EmployeeService.Persistence;
@@ -27,9 +28,26 @@ public class EmployeesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var repo = new Repository<Employee>(_context);
-        var items = await repo.GetAllAsync();
-        return Ok(items);
+        try
+        {
+			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+			var repo = new Repository<Employee>(_context);
+			var items = await repo.GetAllAsync();
+			return Ok(items);
+		}
+        catch (Exception ex)
+        {
+
+			// You can log here, too (e.g., to file, Grafana Loki, etc.)
+			return StatusCode(500, new
+			{
+				message = "An error occurred while retrieving data.",
+				error = ex.Message,        // Optional: return ex.StackTrace for full trace
+				type = ex.GetType().Name
+			});
+		}
+     
     }
 
     [HttpGet("{id}")]
