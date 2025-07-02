@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel;
+using Microsoft.AspNetCore.Identity;
 
 namespace AuthService.Persistence
 {
 	public class ApplicationUser : IdentityUser
 	{
-	//	public int LicenseId { get; set; }
 
 		// Add custom properties here if needed
+	//	public int LicenseId { get; set; }
+	//	public string? Role { get; set; } 
 
 	}
 }

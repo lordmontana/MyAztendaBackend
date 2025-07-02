@@ -1,9 +1,11 @@
 using AuthService.Persistence;
+using AuthService.Services.Interfaces;
 using AuthService.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using AuthService.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,9 @@ builder.Configuration
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService,AuthService.Services.AuthService> ();
+builder.Services.AddScoped<IUserService, AuthService.Services.AuthService >();
+builder.Services.AddScoped<INotificationService, AuthService.Services.AuthService >();
 
 // Add DbContext for Identity and your Application DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -24,10 +29,6 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-
-    
-
-
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
