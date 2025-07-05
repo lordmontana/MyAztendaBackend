@@ -36,37 +36,13 @@ namespace AuthService.Controllers
 		[HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var response = await _authService.RegisterAsync(model);
+			if (!string.IsNullOrEmpty(response.Error))
+				return BadRequest(new { response.Error });
 
-            var user = new ApplicationUser { UserName = model.Username, Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
-            {
-                // Add custom claims
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, model.Email),
-                    new Claim("sub", user.Id),  // Custom claim for 'sub'
-                    // Add any other claims you need here
-                };
-
-                var addClaimsResult = await _userManager.AddClaimsAsync(user, claims);
-                if (!addClaimsResult.Succeeded)
-                {
-                    return BadRequest("Failed to add claims to the user.");
-                }
-
-                // Optionally, sign in the user after registration
-                await _signInManager.SignInAsync(user, isPersistent: false);
-
-                return Ok(new { Message = "User registered successfully." });
-            }
-
-
-            return BadRequest(result.Errors);
-        }
-
+			return Ok(response);
+		}
 
 		// Login endpoint
 		[HttpPost("login")]

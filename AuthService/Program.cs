@@ -98,7 +98,7 @@ app.UseAuthorization();   // Authorization must be after Authentication
 // Map Controllers
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers();
+	endpoints.MapControllers();
 });
 
 app.Run();

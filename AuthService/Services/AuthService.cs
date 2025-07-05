@@ -1,4 +1,5 @@
-﻿using AuthService.Models;
+﻿using System.Security.Claims;
+using AuthService.Models;
 using AuthService.Persistence;
 using AuthService.Services.Interfaces;
 using AuthService.Settings;
@@ -58,22 +59,81 @@ namespace AuthService.Services
 			// Store in Redis with an expiration time
 			#endregion
 
+			return CreateAuthResponse(user, token, request.Password);
+		}
+
+
+		public async Task<AuthResponse> RegisterAsync(RegisterModel request)
+		{
+			var existingUser = await _userManager.FindByNameAsync(request.Username);
+			if (existingUser != null)
+			{
+				return new AuthResponse
+				{
+					Error = "Username is already taken."
+				};
+			}
+
+			var user = new ApplicationUser
+			{
+				UserName = request.Username,
+				Email = request.Username // Or request.Email if you're using RegisterModel
+			};
+
+			var result = await _userManager.CreateAsync(user, request.Password);
+
+			if (!result.Succeeded)
+			{
+				return new AuthResponse
+				{
+					Error = string.Join(", ", result.Errors.Select(e => e.Description))
+				};
+			}
+
+			// Add claims
+			var claims = new List<Claim>
+			{
+			new Claim(ClaimTypes.Name, user.UserName),
+			new Claim("sub", user.Id)
+			};
+
+			var claimsResult = await _userManager.AddClaimsAsync(user, claims);
+			if (!claimsResult.Succeeded)
+			{
+				return new AuthResponse
+				{
+					Error = "Failed to add claims."
+				};
+			}
+
+			// Optional: Sign in the user
+			await _signInManager.SignInAsync(user, isPersistent: false);
+
+			// Generate token
+			var token = _tokenService.GenerateJwtToken(user);
+
+			return CreateAuthResponse(user, token, request.Password);
+
+		}
+		private AuthResponse CreateAuthResponse(ApplicationUser user, string token, string? originalPassword = null)
+		{
 			return new AuthResponse
 			{
 				User = new UserDto(user),
 				Session = new SessionDto
 				{
 					AccessToken = token,
-					ExpiresIn = _jwtSettings.ExpireMinutes * 60, // 1 hour
+					ExpiresIn = _jwtSettings.ExpireMinutes * 60,
 					CreatedAt = DateTime.UtcNow
 				},
-				WeakPassword = request.Password.Length < 6 ? "Password is weak" : null
+				WeakPassword = originalPassword != null && originalPassword.Length < 6
+		? "Password is weak"
+		: null
 			};
 		}
 
 		// Other methods not implemented yet
 		public Task<AuthResponse> LogoutAsync(string userId) => throw new NotImplementedException();
-		public Task<AuthResponse> RegisterAsync(LoginModel request) => throw new NotImplementedException();
 		public Task<AuthResponse> RefreshTokenAsync(string refreshToken) => throw new NotImplementedException();
 		public Task<AuthResponse> GetUserAsync(string userId) => throw new NotImplementedException();
 		public Task<AuthResponse> UpdateUserAsync(string userId, LoginModel request) => throw new NotImplementedException();
