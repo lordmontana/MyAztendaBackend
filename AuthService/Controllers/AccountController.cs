@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using AuthService.Models;
 using AuthService.Persistence;
+using AuthService.Services;
 using AuthService.Services.Interfaces;
-using AuthService.Settings;
 using Duende.IdentityServer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

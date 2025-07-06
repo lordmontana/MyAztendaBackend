@@ -2,7 +2,6 @@
 using AuthService.Models;
 using AuthService.Persistence;
 using AuthService.Services.Interfaces;
-using AuthService.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
@@ -13,13 +12,13 @@ namespace AuthService.Services
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly SignInManager<ApplicationUser> _signInManager;
 		private readonly ITokenService _tokenService;
-		private readonly JwtSettings _jwtSettings;
+		private readonly JwtSettingsModel _jwtSettings;
 
 		public AuthService(
 			UserManager<ApplicationUser> userManager,
 			SignInManager<ApplicationUser> signInManager,
 			ITokenService tokenService,
-			IOptions<JwtSettings> jwtOptions)
+			IOptions<JwtSettingsModel> jwtOptions)
 	
 		{
 			_userManager = userManager;

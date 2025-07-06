@@ -1,6 +1,6 @@
-﻿namespace AuthService.Settings
+﻿namespace AuthService.Models
 {
-	public class JwtSettings
+	public class JwtSettingsModel
 	{
 		public string SecretKey { get; set; }
 		public string Issuer { get; set; }

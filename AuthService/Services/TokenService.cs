@@ -1,12 +1,12 @@
-﻿using AuthService.Persistence;
-using AuthService.Settings;
+﻿using AuthService.Models;
+using AuthService.Persistence;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace AuthService.Settings
+namespace AuthService.Services
 {
 	public interface ITokenService
 	{
@@ -15,9 +15,9 @@ namespace AuthService.Settings
 
 	public class TokenService : ITokenService
 	{
-		private readonly JwtSettings _jwtSettings;
+		private readonly JwtSettingsModel _jwtSettings;
 
-		public TokenService(IOptions<JwtSettings> jwtOptions)
+		public TokenService(IOptions<JwtSettingsModel> jwtOptions)
 		{
 			_jwtSettings = jwtOptions.Value;
 		}
