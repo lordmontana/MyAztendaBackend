@@ -107,6 +107,22 @@ builder.Services.AddSwaggerGen(options =>
 	});
 });
 
+// Configure CORS to allow requests from the frontend
+var allowedOrigins = builder.Configuration
+	.GetSection("Cors:AllowedOrigins")
+	.Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowFrontend", policy =>
+	{
+		policy
+			.WithOrigins(allowedOrigins)
+			.AllowAnyHeader()
+			.AllowAnyMethod();
+	});
+});
+
 
 if (builder.Environment.EnvironmentName == "Docker")
 {
@@ -130,6 +146,7 @@ app.UseOcelot().Wait();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 

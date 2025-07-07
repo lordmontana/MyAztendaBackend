@@ -51,6 +51,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
+// Configure CORS to allow requests from the frontend
+var allowedOrigins = builder.Configuration
+	.GetSection("Cors:AllowedOrigins")
+	.Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowFrontend", policy =>
+	{
+		policy
+			.WithOrigins(allowedOrigins) 
+			.AllowAnyHeader()
+			.AllowAnyMethod();
+	});
+});
+
 // Add Redis configuration
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -90,6 +106,7 @@ app.UseSwaggerUI(c =>
 
 // Use Routing (this needs to be called before UseAuthentication and UseAuthorization)
 app.UseRouting();
+app.UseCors("AllowFrontend");
 
 
 app.UseAuthentication();  // Authentication must come before Authorization
