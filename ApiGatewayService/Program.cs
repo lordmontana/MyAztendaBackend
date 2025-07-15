@@ -1,4 +1,4 @@
-using ApiGatewayService.Settings;
+﻿using ApiGatewayService.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -131,25 +131,20 @@ if (builder.Environment.EnvironmentName == "Docker")
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.UseCors("AllowFrontend");          
+app.UseAuthentication();             
 
-#region Ocelot
 app.UseSwaggerForOcelotUI(opt =>
 {
     opt.PathToSwaggerGenerator = "/swagger/docs";
-
 });
 
-app.UseOcelot().Wait();
-#endregion
+await app.UseOcelot();              
 
 app.UseStaticFiles();
-
 app.UseRouting();
-app.UseCors("AllowFrontend");
-
 app.UseAuthorization();
-
 app.MapRazorPages();
+app.MapGet("/", () => "Hello World!");
 
 app.Run();
