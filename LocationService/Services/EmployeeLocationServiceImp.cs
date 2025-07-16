@@ -28,7 +28,7 @@ namespace LocationService.Services
                 Id = l.Id,
                 Name = l.Name,
                 Region = l.Region,
-                ClientId = l.ClientId
+                ClientId = l.IId
             }));
 
             return locationList;
@@ -48,7 +48,7 @@ namespace LocationService.Services
                 Id = location.Id,
                 Name = location.Name,
                 Region = location.Region,
-                ClientId = location.ClientId
+                ClientId = location.IId
             };
         }
     }

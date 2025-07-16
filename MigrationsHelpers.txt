@@ -1,0 +1,52 @@
+﻿
+Commands to add initial migrations for each service
+:: ───────────── AuthService ─────────────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\AuthService"
+dotnet ef migrations add InitialAuth
+
+:: ───────────── CustomerService ────────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\CustomerService"
+dotnet ef migrations add InitialCustomer
+
+:: ───────────── EmployeeService ────────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\EmployeeService"
+dotnet ef migrations add InitialEmployee
+
+:: ───────────── LocationService ────────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\LocationService"
+dotnet ef migrations add InitialLocation
+
+:: ───────────── ProductService ─────────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\ProductService"
+dotnet ef migrations add InitialProduct
+
+:: ───────────── TicketingService ───────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\TicketingService"
+dotnet ef migrations add InitialTicketing
+
+
+
+Commands to update the database for each service
+:: ───────────── AuthService ─────────────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\AuthService"
+dotnet ef database update
+
+:: ───────────── CustomerService ────────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\CustomerService"
+dotnet ef database update
+
+:: ───────────── EmployeeService ────────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\EmployeeService"
+dotnet ef database update
+
+:: ───────────── LocationService ────────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\LocationService"
+dotnet ef database update
+
+:: ───────────── ProductService ─────────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\ProductService"
+dotnet ef database update
+
+:: ───────────── TicketingService ───────
+cd "C:\Users\mau555\Desktop\project atzenda\MyAztendaBackend\TicketingService"
+dotnet ef database update

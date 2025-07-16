@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AuthService.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250427050421_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250716172826_InitialAuth")]
+    partial class InitialAuth
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,9 @@ namespace AuthService.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("IId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -66,6 +69,10 @@ namespace AuthService.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Role")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");

@@ -62,7 +62,7 @@ public class LocationsController : ControllerBase
 		{
 			Name = dto.Name,
 			Region = dto.Region,
-			ClientId = dto.ClientId
+			IId = dto.ClientId
 		};
 
 		await repo.AddAsync(location);
@@ -82,7 +82,7 @@ public class LocationsController : ControllerBase
 
 		if (!string.IsNullOrWhiteSpace(dto.Name)) location.Name = dto.Name;
 		if (!string.IsNullOrWhiteSpace(dto.Region)) location.Region = dto.Region;
-		if (dto.ClientId.HasValue) location.ClientId = dto.ClientId.Value;
+		if (dto.ClientId.HasValue) location.IId = dto.ClientId.Value;
 
 		repo.Update(location);
 		await repo.SaveChangesAsync();

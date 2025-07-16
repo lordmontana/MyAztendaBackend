@@ -1,9 +1,3 @@
--- Create the Employee table
-CREATE TABLE Employee (
-    Id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incrementing primary key
-    Name NVARCHAR(255) NOT NULL,      -- Name of the employee
-    Gender NVARCHAR(50) NOT NULL      -- Gender of the employee
-);
 
 -- Insert dummy values into the Employee table
 INSERT INTO Employee (Name, Gender) VALUES
@@ -13,24 +7,12 @@ INSERT INTO Employee (Name, Gender) VALUES
 ('Diana', 'Female'),
 ('Evan', 'Male');
 
--- Create the Customer table
-CREATE TABLE Customer (
-    Id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incrementing primary key
-    Name NVARCHAR(100),
-    Gender NVARCHAR(10)
-);
+
 -- Insert 3 dummy records
 INSERT INTO Customer ( Name, Gender) VALUES ('John', 'Male');
 INSERT INTO Customer ( Name, Gender) VALUES ('Abaid', 'Male');
 INSERT INTO Customer ( Name, Gender) VALUES ('Awan', 'Male');
 
--- Create the Location table
-CREATE TABLE Location (
-    Id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incrementing primary key
-    Name NVARCHAR(255) NOT NULL,      -- Name of the location
-    Region NVARCHAR(255) NOT NULL,    -- Region of the location
-    ClientId INT NOT NULL             -- Foreign key or identifier for the client
-);
 
 -- Insert dummy values into the Location table
 INSERT INTO Location (Name, Region, ClientId) VALUES
@@ -41,13 +23,6 @@ INSERT INTO Location (Name, Region, ClientId) VALUES
 ('Cape Town Office', 'Africa', 5);
 
 
--- Create the Product table
-CREATE TABLE Product (
-    Id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incrementing primary key
-    Name NVARCHAR(255) NOT NULL,      -- Name of the product
-    Price DECIMAL(18,2) NOT NULL,     -- Price of the product with 2 decimal places
-    Stock INT NOT NULL                -- Stock quantity
-);
 
 -- Insert dummy values into the Product table
 INSERT INTO Product (Name, Price, Stock) VALUES
@@ -57,17 +32,6 @@ INSERT INTO Product (Name, Price, Stock) VALUES
 ('Smartwatch', 199.99, 75),
 ('Wireless Earbuds', 99.99, 200);
 
-
--- Create the Ticket table
-CREATE TABLE Ticket (
-    Id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incrementing primary key
-    Title NVARCHAR(255) NOT NULL,     -- Title of the ticket
-    Description NVARCHAR(MAX) NOT NULL, -- Detailed description of the ticket
-    Status NVARCHAR(50) NOT NULL DEFAULT 'Open', -- Status of the ticket
-    CreatedDate DATETIME NOT NULL DEFAULT GETUTCDATE(), -- Date the ticket was created
-    ClosedDate DATETIME NULL,         -- Date the ticket was closed (nullable)
-    AssignedTo INT NOT NULL           -- ID of the user/employee assigned to the ticket
-);
 
 -- Insert dummy values into the Ticket table
 INSERT INTO Ticket (Title, Description, Status, CreatedDate, ClosedDate, AssignedTo) VALUES
