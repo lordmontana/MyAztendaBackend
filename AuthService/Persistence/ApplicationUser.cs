@@ -8,7 +8,7 @@ namespace AuthService.Persistence
 	{
 
 		// Add custom properties here if needed
-		public int? IId { get; set; }
+		public int IId { get; set; }
 
 		[MaxLength(50)]
 		public string? Role { get; set; } 

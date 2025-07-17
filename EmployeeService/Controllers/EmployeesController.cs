@@ -1,11 +1,13 @@
-using System.Security.Claims;
 using EmployeeService.DTOs;
-using EmployeeService.Models;
+using EmployeeService.Entities;
 using EmployeeService.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Shared.Admin.Interfaces;
 using Shared.Repositories;
+using System.Security.Claims;
 
 namespace EmployeeService.Controllers;
 
@@ -16,11 +18,13 @@ public class EmployeesController : ControllerBase
 {
     private readonly ILogger<EmployeesController> _logger;
     private readonly ApplicationDbContext _context;
+    private readonly IUserInfoProvider _Admin;   // 
 
-    public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context)
+    public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context,IUserInfoProvider Admin)
     {
         _logger = logger;
         _context = context;
+        _Admin = Admin;  
     }
 
 
@@ -38,11 +42,12 @@ public class EmployeesController : ControllerBase
 		}
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error retrieving employees");
 
 			// You can log here, too (e.g., to file, Grafana Loki, etc.)
 			return StatusCode(500, new
-			{
-				message = "An error occurred while retrieving data.",
+            {
+                message = "An error occurred while retrieving data.",
 				error = ex.Message,        // Optional: return ex.StackTrace for full trace
 				type = ex.GetType().Name
 			});

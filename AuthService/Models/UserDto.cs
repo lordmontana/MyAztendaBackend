@@ -8,14 +8,15 @@ namespace AuthService.Models
 		public string Username { get; set; }
 		public string? Email { get; set; }
 		public string? Role { get; set; }
-		public int? LicenseId { get; set; }
+		public int IId { get; set; }
 
 		public UserDto(ApplicationUser user)
 		{
 			Id = user.Id;
 			Username = user.UserName!;
 			Email = user.Email;
-			//Role = user.Role;         // 
+			IId = user.IId;
+			Role = "user"; // user.Role;         // 
 			//LicenseId = user.LicenseId; // Customize based on your model
 		}
 	}

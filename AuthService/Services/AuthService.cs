@@ -93,8 +93,10 @@ namespace AuthService.Services
 			var claims = new List<Claim>
 			{
 			new Claim(ClaimTypes.Name, user.UserName),
-			new Claim("sub", user.Id)
-			};
+			new Claim("sub", user.Id),
+			new Claim("installationId", user.IId?.ToString() ?? string.Empty)// edw prepei na mpei pinakas licenses or select max(iid) from users 
+
+            };
 
 			var claimsResult = await _userManager.AddClaimsAsync(user, claims);
 			if (!claimsResult.Succeeded)

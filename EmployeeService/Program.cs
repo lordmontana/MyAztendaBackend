@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Shared.Admin.Interfaces;
+using Shared.Admin.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,7 +80,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 			}
 		};
 	});
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserInfoProvider, UserInfoProvider>();
 builder.Services.AddAuthorization();
 
 // Add DbContext
