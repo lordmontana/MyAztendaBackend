@@ -94,7 +94,7 @@ namespace AuthService.Services
 			{
 			new Claim(ClaimTypes.Name, user.UserName),
 			new Claim("sub", user.Id),
-			new Claim("installationId", user.IId?.ToString() ?? string.Empty)// edw prepei na mpei pinakas licenses or select max(iid) from users 
+			new Claim("installationId", user.IId.ToString() ?? string.Empty)// edw prepei na mpei pinakas licenses or select max(iid) from users 
 
             };
 

@@ -2,7 +2,7 @@
 using Shared.Admin.Interfaces;     // ← IUserInfoProvider
 using System.Linq.Expressions;
 using Shared.Entities;
-using EmployeeService.Entities;           // for IHasInstallation
+using EmployeeService.Entities.Forms;           // for IHasInstallation
 
 namespace EmployeeService.Persistence
 {

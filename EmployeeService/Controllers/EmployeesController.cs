@@ -1,12 +1,17 @@
 using EmployeeService.DTOs;
-using EmployeeService.Entities;
+using EmployeeService.Entities.Forms;
 using EmployeeService.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared.Admin.Interfaces;
+using Shared.Dtos;
+using Shared.Filtering;
 using Shared.Repositories;
+using System;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Security.Claims;
 
 namespace EmployeeService.Controllers;
@@ -19,12 +24,15 @@ public class EmployeesController : ControllerBase
     private readonly ILogger<EmployeesController> _logger;
     private readonly ApplicationDbContext _context;
     private readonly IUserInfoProvider _Admin;   // 
+    private readonly IRepository<Employee> _repo;
 
-    public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context,IUserInfoProvider Admin)
+
+    public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context,IUserInfoProvider Admin, IRepository<Employee> repo)
     {
         _logger = logger;
         _context = context;
         _Admin = Admin;  
+        _repo = repo;
     }
 
 
@@ -54,6 +62,32 @@ public class EmployeesController : ControllerBase
 		}
      
     }
+
+    [HttpPost("search")]                        // POST /api/employees/search
+    public async Task<IActionResult> Search([FromBody] PagedRequest req)
+    {
+        try
+        {
+            var parser = ParserFactory.Get<Employee>(req.Mode);
+
+            var predicates = parser.Parse(req.Filters ?? new());
+
+            var result = await _repo.QueryAsync(
+                page: Math.Max(req.Page, 0),
+                pageSize: Math.Clamp(req.PageSize, 1, 100),
+                orderBy: e => e.Name,
+                ascending: true,
+                filters: predicates);
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Get employees failed");
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
+
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)

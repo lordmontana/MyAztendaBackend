@@ -1,7 +1,7 @@
 ﻿using Shared.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EmployeeService.Entities
+namespace EmployeeService.Entities.Forms
 {
     public class Employee : BaseEntity
     {

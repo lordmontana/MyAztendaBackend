@@ -7,6 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.Admin.Interfaces;
 using Shared.Admin.Services;
+using Shared.Repositories;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +89,9 @@ builder.Services.AddAuthorization();
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 #region GRPC
 builder.Services.AddScoped<EmployeeGRPCClientService>(provider =>
