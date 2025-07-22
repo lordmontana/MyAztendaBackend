@@ -9,6 +9,8 @@ using Shared.Admin.Interfaces;
 using Shared.Dtos;
 using Shared.Filtering;
 using Shared.Repositories;
+using Shared.Repositories.Abstractions;
+using Shared.Repositories.Persistence;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;

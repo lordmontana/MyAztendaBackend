@@ -27,13 +27,16 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="8.1.1" />
   </ItemGroup>
-	<ItemGroup>
-		<Protobuf Include="Proto\EmployeeLocation.proto" GrpcServices="Client">
-			<Link>Proto\EmployeeLocation.proto</Link>
-		</Protobuf>
-	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
+	  <Protobuf Include="Proto\EmployeeLocation.proto" GrpcServices="Client">
+		  <Link>Proto\EmployeeLocation.proto</Link>
+	  </Protobuf>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Application\Cqrs\Commands\" />
+    <Folder Include="Application\Cqrs\Mapping\" />
+    <Folder Include="Application\Cqrs\Queries\" />
   </ItemGroup>
 
 </Project>

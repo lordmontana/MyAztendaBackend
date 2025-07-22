@@ -3,6 +3,7 @@ using CustomerService.Models;
 using CustomerService.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Repositories;
+using Shared.Repositories.Persistence;
 
 namespace CustomerService.Controllers;
 

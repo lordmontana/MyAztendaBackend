@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Shared.Repositories;
+using Shared.Repositories.Persistence;
 using TicketingService.DTOs;
 using TicketingService.Entities;
 using TicketingService.Persistence;

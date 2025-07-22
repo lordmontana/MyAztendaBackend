@@ -7,7 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.Admin.Interfaces;
 using Shared.Admin.Services;
-using Shared.Repositories;
+using Shared.Repositories.Abstractions;
+using Shared.Repositories.Persistence;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);

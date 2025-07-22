@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shared.Dtos;
+using Shared.Repositories.Abstractions;
 using System;
 using System.Linq.Expressions;
 
-namespace Shared.Repositories
+namespace Shared.Repositories.Persistence
 {
 	public class Repository<T> : IRepository<T> where T : class
 	{

@@ -3,6 +3,7 @@ using ProductService.DTOs;
 using ProductService.Entities;
 using ProductService.Persistence;
 using Shared.Repositories;
+using Shared.Repositories.Persistence;
 
 namespace ProductService.Controllers;
 

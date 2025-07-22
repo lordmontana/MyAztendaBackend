@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.Repositories
+namespace Shared.Repositories.Abstractions
 {
 	public interface IRepository<T> where T : class
 	{

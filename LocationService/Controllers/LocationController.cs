@@ -5,6 +5,7 @@ using LocationService.Entities;
 using LocationService.DTOs;
 using Shared.Repositories;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using Shared.Repositories.Persistence;
 
 namespace LocationService.Controllers;
 
