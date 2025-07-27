@@ -2,6 +2,7 @@
 using Shared.Dtos;
 using Shared.Repositories.Abstractions;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Shared.Repositories.Persistence
@@ -29,6 +30,7 @@ namespace Shared.Repositories.Persistence
 
 		public async Task<bool> SaveChangesAsync() => await _context.SaveChangesAsync() > 0;
 
+        public IQueryable<T> Query => _context.Set<T>().AsQueryable();
 
         public Task<PagedResult<T>> GetPagedAsync(
             int page,
@@ -64,6 +66,6 @@ namespace Shared.Repositories.Persistence
             return new PagedResult<T>(data, total);
         }
 
-
+        public Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default) => _dbSet.AnyAsync(predicate, ct);
     }
 }

@@ -3,18 +3,17 @@ using EmployeeService.Entities.Forms;
 using EmployeeService.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Shared.Admin.Interfaces;
 using Shared.Dtos;
-using Shared.Filtering;
-using Shared.Repositories;
 using Shared.Repositories.Abstractions;
 using Shared.Repositories.Persistence;
-using System;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Security.Claims;
+using Shared.Cqrs;          
+
+using EmployeeService.Application.Cqrs.Commands.EmployeeForm.CRUD;
+using EmployeeService.Application.Cqrs.Queries.EmployeeForm;
+
+
 
 namespace EmployeeService.Controllers;
 
@@ -27,68 +26,36 @@ public class EmployeesController : ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly IUserInfoProvider _Admin;   // 
     private readonly IRepository<Employee> _repo;
+    private readonly MiniMediator _med;
 
 
-    public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context,IUserInfoProvider Admin, IRepository<Employee> repo)
+    public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context,IUserInfoProvider Admin, IRepository<Employee> repo,MiniMediator med)
     {
         _logger = logger;
         _context = context;
         _Admin = Admin;  
         _repo = repo;
+        _med = med;
     }
 
 
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        try
-        {
-			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+   // [HttpGet]//SearchEmployees does the same. we will never give this endpoint to frontend. Only with pagination etc
+   // public async Task<IActionResult> GetAll()
+   // {
+   //  
+	//		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+	//		var repo = new Repository<Employee>(_context);
+	//		var items = await repo.GetAllAsync();
+	//		return Ok(items);
+   //
+   // }
 
-			var repo = new Repository<Employee>(_context);
-			var items = await repo.GetAllAsync();
-			return Ok(items);
-		}
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving employees");
-
-			// You can log here, too (e.g., to file, Grafana Loki, etc.)
-			return StatusCode(500, new
-            {
-                message = "An error occurred while retrieving data.",
-				error = ex.Message,        // Optional: return ex.StackTrace for full trace
-				type = ex.GetType().Name
-			});
-		}
-     
-    }
-
-    [HttpPost("search")]                        // POST /api/employees/search
-    public async Task<IActionResult> Search([FromBody] PagedRequest req)
-    {
-        try
-        {
-            var parser = ParserFactory.Get<Employee>(req.Mode);
-
-            var predicates = parser.Parse(req.Filters ?? new());
-
-            var result = await _repo.QueryAsync(
-                page: Math.Max(req.Page, 0),
-                pageSize: Math.Clamp(req.PageSize, 1, 100),
-                orderBy: e => e.Name,
-                ascending: true,
-                filters: predicates);
-
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Get employees failed");
-            return StatusCode(500, new { message = ex.Message });
-        }
-    }
+    /// <summary>Search employees with paging & dynamic filters.</summary>
+    [HttpPost("search")]
+    public Task<PagedResult<EmployeeDto>> SearchEmployees([FromBody] PagedRequest req)
+        => _med.SendAsync(new SearchEmployeesQuery(
+               req.Page, req.PageSize, req.Mode, req.Filters ?? new()));
 
 
     [HttpGet("{id}")]
@@ -100,55 +67,15 @@ public class EmployeesController : ControllerBase
         return item is null ? NotFound() : Ok(item);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Create(EmployeeDto dto)
-    {
+    [HttpPost]                                      
+    public Task<int> Create([FromBody] EmployeeDto dto) => _med.SendAsync(new CreateEmployeeCommand(dto));
 
-        var repo = new Repository<Employee>(_context);
+    [HttpPut("{id:int}")]
+    public Task<int> Update(int id, [FromBody] EmployeeDto dto) =>
+    _med.SendAsync(new UpdateEmployeeCommand(id, dto));
 
-        var employee = new Employee
-        {
-            Name = dto.Name,
-            Gender = dto.Gender,
-        };
+    [HttpDelete("{id:int}")]
+    public Task Delete(int id)
+    => _med.SendAsync(new DeleteEmployeeCommand(id));
 
-        await repo.AddAsync(employee);
-        await repo.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetById), new { id = employee.Id }, employee);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, EmployeeDto dto)
-    {
-
-        var repo = new Repository<Employee>(_context);
-
-        var employee = await repo.GetByIdAsync(id);
-        if (employee is null) return NotFound(); 
-
-        if (!string.IsNullOrWhiteSpace(dto.Name)) employee.Name = dto.Name;
-        if (!string.IsNullOrWhiteSpace(dto.Gender)) employee.Gender = dto.Gender;
-
-
-        repo.Update(employee);
-        await repo.SaveChangesAsync();
-
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-
-        var repo = new Repository<Employee>(_context);
-
-        var employee = await repo.GetByIdAsync(id);
-        if (employee is null) return NotFound();
-
-        repo.Delete(employee);
-        await repo.SaveChangesAsync();
-
-        return NoContent();
-    }
 }

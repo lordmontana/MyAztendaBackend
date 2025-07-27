@@ -34,9 +34,8 @@
 	  </Protobuf>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Application\Cqrs\Commands\" />
-    <Folder Include="Application\Cqrs\Mapping\" />
-    <Folder Include="Application\Cqrs\Queries\" />
+    <Folder Include="Application\Cqrs\Commands\EmployeeForm\Actions\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

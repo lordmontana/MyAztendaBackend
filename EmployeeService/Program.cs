@@ -1,3 +1,5 @@
+using EmployeeService.Application.Cqrs.Commands.EmployeeForm.CRUD;
+using EmployeeService.Cqrs.Commands;  // marker type
 using EmployeeService.Persistence;
 using EmployeeService.Services;
 using EmployeeService.Settings;
@@ -7,13 +9,16 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.Admin.Interfaces;
 using Shared.Admin.Services;
+using Shared.Cqrs.DependencyInjection;
 using Shared.Repositories.Abstractions;
 using Shared.Repositories.Persistence;
+using Shared.Web.DependencyInjection;
 using System;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -93,6 +98,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 
 builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddCqrs(typeof(CreateEmployeeCommand).Assembly);  // scans this service
 
 #region GRPC
 builder.Services.AddScoped<EmployeeGRPCClientService>(provider =>
@@ -116,12 +122,13 @@ if (builder.Environment.EnvironmentName == "Docker")
 	builder.WebHost.UseUrls("http://*:80");
 }
 var app = builder.Build();
+app.UseGlobalExceptionHandling();
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
 
-    app.UseSwagger(c =>
+app.UseSwagger(c =>
     {
         c.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0;
     });

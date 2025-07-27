@@ -21,9 +21,9 @@ public static class AddCqrsExtension
                 .AsImplementedInterfaces().WithScopedLifetime());
 
         // 2. Decorators (outermost first)
-        svc.Decorate(typeof(ICommandHandler<>), typeof(LoggingCommandDecorator<>));
-        svc.Decorate(typeof(ICommandHandler<,>), typeof(LoggingCommandDecorator<>));
-        svc.Decorate(typeof(IQueryHandler<,>), typeof(LoggingQueryDecorator<,>));
+        svc.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandDecorator<>));
+        svc.TryDecorate(typeof(ICommandHandler<,>), typeof(LoggingCommandDecorator<>));
+        svc.TryDecorate(typeof(IQueryHandler<,>), typeof(LoggingQueryDecorator<,>));
 
         // 3. MiniMediator
         svc.AddScoped<MiniMediator>();
