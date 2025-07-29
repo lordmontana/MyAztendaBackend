@@ -11,11 +11,13 @@ namespace Shared.Admin.Models
 	{
         public string UserId { get; }
         public int InstallationId { get; }
+        public string UserName { get; }
 
-        public UserInfo(string userId, int installationId)
+        public UserInfo(string userId, int installationId,string userName)
 		{
             UserId = userId ?? throw new ArgumentNullException(nameof(userId));
             InstallationId = installationId;
+            UserName = userName ?? throw new ArgumentNullException(nameof(userName));
 
         }
 	}

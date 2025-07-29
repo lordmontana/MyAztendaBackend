@@ -1,5 +1,6 @@
-using EmployeeService.Application.Cqrs.Commands.EmployeeForm.CRUD;
+﻿using EmployeeService.Application.Cqrs.Commands.EmployeeForm.CRUD;
 using EmployeeService.Cqrs.Commands;  // marker type
+using EmployeeService.Logging;
 using EmployeeService.Persistence;
 using EmployeeService.Services;
 using EmployeeService.Settings;
@@ -10,11 +11,13 @@ using Microsoft.OpenApi.Models;
 using Shared.Admin.Interfaces;
 using Shared.Admin.Services;
 using Shared.Cqrs.DependencyInjection;
+using Shared.Logging.Extensions;
+using Shared.Logging.Interceptors;
+using Shared.Logging.Interfaces;
 using Shared.Repositories.Abstractions;
 using Shared.Repositories.Persistence;
 using Shared.Web.DependencyInjection;
 using System;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,9 +92,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 		};
 	});
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IUserInfoProvider, UserInfoProvider>();
 builder.Services.AddAuthorization();
-
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -99,6 +100,8 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddCqrs(typeof(CreateEmployeeCommand).Assembly);  // scans this service
+builder.Services.AddScoped<IUserInfoProvider, UserInfoProvider>();
+builder.Services.AddScoped<UserInfoProvider>();
 
 #region GRPC
 builder.Services.AddScoped<EmployeeGRPCClientService>(provider =>
@@ -123,6 +126,8 @@ if (builder.Environment.EnvironmentName == "Docker")
 }
 var app = builder.Build();
 app.UseGlobalExceptionHandling();
+app.UseMiddleware<RawBodyMiddleware>();
+
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())

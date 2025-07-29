@@ -25,6 +25,10 @@ public static class AddCqrsExtension
         svc.TryDecorate(typeof(ICommandHandler<,>), typeof(LoggingCommandDecorator<>));
         svc.TryDecorate(typeof(IQueryHandler<,>), typeof(LoggingQueryDecorator<,>));
 
+      //  //  NEW – sits inside the logging decorator
+      //  svc.TryDecorate(typeof(ICommandHandler<>), typeof(AuditLoggingDecorator<>));
+      //  svc.TryDecorate(typeof(ICommandHandler<,>), typeof(AuditLoggingDecorator<,>));
+
         // 3. MiniMediator
         svc.AddScoped<MiniMediator>();
 

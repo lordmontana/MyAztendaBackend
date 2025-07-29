@@ -22,21 +22,21 @@ namespace Shared.Admin.Services
             // ── 1. design-time / non-HTTP code path ───────────────
             if (principal == null || principal.Identity?.IsAuthenticated != true)
             {
-                _cached = new UserInfo("design-time", 0);   // neutral tenant
+                _cached = new UserInfo("design-time", 0,"");   // neutral tenant
                 return _cached;
             }
 
             // ── 2. runtime: claim *must* be present ───────────────
             var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var instStr = principal.FindFirst("installationId")?.Value;
-
+            var userName = principal.FindFirst(ClaimTypes.Name)?.Value;
             if (string.IsNullOrWhiteSpace(userId) ||
                 !int.TryParse(instStr, out var installationId))
             {
                 throw new UnauthorizedAccessException("Missing installationId claim.");
             }
 
-            _cached = new UserInfo(userId, installationId);
+            _cached = new UserInfo(userId, installationId, userName);
             return _cached;
         }
 
