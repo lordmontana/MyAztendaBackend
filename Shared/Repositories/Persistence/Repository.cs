@@ -58,9 +58,12 @@ namespace Shared.Repositories.Persistence
             if (orderBy is not null)
                 query = ascending ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
 
+            /* paging (assume 1-based; change if you want 0-based) */
             if (page is not null && pageSize is not null)
-                query = query.Skip(page.Value * pageSize.Value)
-                             .Take(pageSize.Value);
+            {
+                var skip = Math.Max(0, page.Value - 1) * pageSize.Value;
+                query = query.Skip(skip).Take(pageSize.Value);
+            }
 
             var data = await query.ToListAsync();
             return new PagedResult<T>(data, total);

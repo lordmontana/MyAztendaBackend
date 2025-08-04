@@ -22,7 +22,7 @@ public sealed class SearchCreateTimeTableHandler(
           q.Page, q.PageSize, e => e.Name, true, preds);
     //
      var list = res.Data
-                     .Select(e => new EmployeeDto(e.Name, e.Gender,""))
+                     .Select(e => new EmployeeDto(e.Id,e.Name, e.Gender,e.Email))
                   .ToList();
 
         return new PagedResult<EmployeeDto>(list, res.Total);

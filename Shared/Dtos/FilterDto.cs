@@ -5,4 +5,4 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Shared.Dtos;
-public sealed record FilterDto(string Field, string Value);
+public sealed record FilterDto(string Field, string Value , string Op );

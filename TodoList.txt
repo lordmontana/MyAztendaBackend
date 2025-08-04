@@ -1,0 +1,1 @@
+create an attribute for entites/ tables where the specific entity is not used logging/auditing

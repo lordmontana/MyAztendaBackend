@@ -14,7 +14,7 @@ public sealed class SearchEmployeesHandler(
     : PagedSearchHandler<Employee, EmployeeDto, SearchEmployeesQuery>(repo)
 {
     protected override Func<Employee, EmployeeDto> Map =>
-        e => new EmployeeDto( e.Name, e.Gender,"");
+        e => new EmployeeDto(e.Id, e.Name, e.Gender,e.Email);
 
     protected override Expression<Func<Employee, object>> OrderBy => e => e.Name;
 }

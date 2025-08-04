@@ -2,15 +2,15 @@
 {
     public class EmployeeDto
     {
-        public EmployeeDto( string? name, string? gender,string? email)
+        public EmployeeDto( int id, string? name, string? gender,string? email)
         {
-          //  Id = id;
+            Id = id;
             Name = name;
             Gender = gender;
             Email = email;
         }
 
-       // public int Id { get; set; }
+        public int Id { get; set; }
         public string? Name { get; set; }
         public string? Gender { get; set; }
         public string? Email { get; set; } 
