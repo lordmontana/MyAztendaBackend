@@ -1,1 +1,6 @@
+back end 
 create an attribute for entites/ tables where the specific entity is not used logging/auditing
+
+
+front end 
+refactor popup to use the same components with generic list view 
