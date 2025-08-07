@@ -1,5 +1,5 @@
 using LocationService;
-using LocationService.Data;
+using LocationService.Persistence;
 using LocationService.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;

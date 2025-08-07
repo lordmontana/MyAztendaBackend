@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using LocationService.Entities;
-using System.Collections.Generic;
+using LocationService.Entities.Forms;
 
-namespace LocationService.Data;
+namespace LocationService.Persistence;
 
 public class ApplicationDbContext : DbContext
 {

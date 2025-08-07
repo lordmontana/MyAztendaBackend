@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using LocationService.Data;
-using LocationService.Entities;
 using LocationService.DTOs;
 using Shared.Repositories;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Shared.Repositories.Persistence;
+using LocationService.Entities.Forms;
+using LocationService.Persistence;
 
 namespace LocationService.Controllers;
 
@@ -62,7 +62,6 @@ public class LocationsController : ControllerBase
 		var location = new Location
 		{
 			Name = dto.Name,
-			Region = dto.Region,
 			IId = dto.ClientId
 		};
 
@@ -82,7 +81,6 @@ public class LocationsController : ControllerBase
 		if (location is null) return NotFound();
 
 		if (!string.IsNullOrWhiteSpace(dto.Name)) location.Name = dto.Name;
-		if (!string.IsNullOrWhiteSpace(dto.Region)) location.Region = dto.Region;
 		if (dto.ClientId.HasValue) location.IId = dto.ClientId.Value;
 
 		repo.Update(location);

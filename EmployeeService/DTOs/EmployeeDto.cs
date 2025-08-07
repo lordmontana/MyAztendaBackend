@@ -1,6 +1,8 @@
 ﻿namespace EmployeeService.DTOs
 {
-    public class EmployeeDto
+    //public class EmployeeDto
+    public sealed record EmployeeDto
+
     {
         public EmployeeDto( int id, string? name, string? gender,string? email)
         {
