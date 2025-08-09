@@ -1,7 +1,6 @@
 ﻿using EmployeeLocationService;
 using Grpc.Core;
-using LocationService.Data;
-using LocationService.Entities;
+using LocationService.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace LocationService.Services
@@ -27,7 +26,6 @@ namespace LocationService.Services
             {
                 Id = l.Id,
                 Name = l.Name,
-                Region = l.Region,
                 ClientId = l.IId
             }));
 
@@ -47,7 +45,6 @@ namespace LocationService.Services
             {
                 Id = location.Id,
                 Name = location.Name,
-                Region = location.Region,
                 ClientId = location.IId
             };
         }

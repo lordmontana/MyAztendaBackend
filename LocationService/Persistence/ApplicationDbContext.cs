@@ -12,6 +12,8 @@ public class ApplicationDbContext : DbContext
     // You can override OnModelCreating if you want to customize your database schema
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("atzenda");   // for postgres
+
         modelBuilder.Entity<Location>().HasKey(p => p.Id);
         base.OnModelCreating(modelBuilder);
     }

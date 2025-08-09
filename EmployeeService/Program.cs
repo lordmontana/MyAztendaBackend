@@ -1,6 +1,5 @@
 ﻿using EmployeeService.Application.Cqrs.Commands.EmployeeForm.CRUD;
 using EmployeeService.Cqrs.Commands;  // marker type
-using EmployeeService.Logging;
 using EmployeeService.Persistence;
 using EmployeeService.Services;
 using EmployeeService.Settings;
@@ -94,9 +93,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
 // Add DbContext
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+	options
+		.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+				   npgsql => npgsql.EnableRetryOnFailure())
+		.UseSnakeCaseNamingConvention()   // optional, but recommended
+);
 builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddCqrs(typeof(CreateEmployeeCommand).Assembly);  // scans this service

@@ -26,6 +26,7 @@ namespace EmployeeService.Persistence
 
         protected override void OnModelCreating(ModelBuilder b)
         {
+            b.HasDefaultSchema("atzenda");   // for postgres
             base.OnModelCreating(b);
 
             // map audit table name once

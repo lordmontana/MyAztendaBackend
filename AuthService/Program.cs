@@ -23,8 +23,11 @@ builder.Services.AddScoped<INotificationService, AuthService.Services.AuthServic
 
 // Add DbContext for Identity and your Application DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+    options
+        .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+                   npgsql => npgsql.EnableRetryOnFailure())
+        .UseSnakeCaseNamingConvention()  
+);
 // Configure Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()

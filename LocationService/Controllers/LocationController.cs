@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using LocationService.DTOs;
 using Shared.Repositories;
-using Microsoft.EntityFrameworkCore.SqlServer;
 using Shared.Repositories.Persistence;
 using LocationService.Entities.Forms;
 using LocationService.Persistence;

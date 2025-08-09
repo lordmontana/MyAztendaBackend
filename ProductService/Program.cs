@@ -19,8 +19,11 @@ builder.Services.AddSwaggerGen(c =>
 });
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+    options
+        .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+                   npgsql => npgsql.EnableRetryOnFailure())
+        .UseSnakeCaseNamingConvention()   // optional, but recommended
+);
 if (builder.Environment.EnvironmentName == "Docker")
 {
 	builder.WebHost.UseUrls("http://*:80");

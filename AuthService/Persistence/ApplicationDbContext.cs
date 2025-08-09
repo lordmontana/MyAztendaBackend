@@ -8,5 +8,13 @@ namespace AuthService.Persistence
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         { }
+
+
+        protected override void OnModelCreating(ModelBuilder b)
+        {
+            b.HasDefaultSchema("atzenda");   // for postgres
+            base.OnModelCreating(b);
+
+        }
     } 
 }
