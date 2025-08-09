@@ -5,16 +5,12 @@ namespace AuthService.Persistence
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        { }
-
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder b)
         {
-            b.HasDefaultSchema("atzenda");   // for postgres
+            b.HasDefaultSchema("atzenda");   // schema first
             base.OnModelCreating(b);
-
         }
-    } 
+    }
 }

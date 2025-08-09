@@ -1,124 +1,94 @@
+using AuthService.Models;
 using AuthService.Persistence;
+using AuthService.Services;
 using AuthService.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using AuthService.Services;
-using AuthService.Models;
-
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration
-	.AddJsonFile("appsettings.json", optional: false)
-	.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-	.AddEnvironmentVariables();
 
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables();
 
 builder.Services.Configure<JwtSettingsModel>(builder.Configuration.GetSection("Jwt"));
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IAuthService,AuthService.Services.AuthService> ();
-builder.Services.AddScoped<IUserService, AuthService.Services.AuthService >();
-builder.Services.AddScoped<INotificationService, AuthService.Services.AuthService >();
 
-// Add DbContext for Identity and your Application DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options
-        .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
-                   npgsql => npgsql.EnableRetryOnFailure())
-        .UseSnakeCaseNamingConvention()  
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService.Services.AuthService>();
+builder.Services.AddScoped<IUserService, AuthService.Services.AuthService>();
+builder.Services.AddScoped<INotificationService, AuthService.Services.AuthService>();
+
+// DbContext (PostgreSQL)
+builder.Services.AddDbContext<ApplicationDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), npgsql =>
+    {
+        npgsql.EnableRetryOnFailure();
+        npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "atzenda");
+    })
+       .UseSnakeCaseNamingConvention()
 );
-// Configure Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+
+// Identity
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        // tweak if you have specific password/lockout requirements
+    })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Configure JWT Authentication
+// JWT auth (reads your Jwt:Issuer/Audience/SecretKey from appsettings)
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://localhost:5000"; // Your IdentityServer URL
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = true,
             ValidateIssuer = true,
+            ValidateAudience = true,
             ValidateIssuerSigningKey = true,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
-            RequireExpirationTime = true,
-			ValidIssuer = builder.Configuration["Jwt:Issuer"],
-			ValidAudience = builder.Configuration["Jwt:Audience"],
-			// Ensure the key is at least 128 bits long
-			IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["Jwt:SecretKey"])) // Base64 128-bit key
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Convert.FromBase64String(builder.Configuration["Jwt:SecretKey"]!))
         };
     });
 
-
-// Configure CORS to allow requests from the frontend
-var allowedOrigins = builder.Configuration
-	.GetSection("Cors:AllowedOrigins")
-	.Get<string[]>();
-
-builder.Services.AddCors(options =>
+builder.Services.AddAuthorization();
+builder.Services.AddCors(opts =>
 {
-	options.AddPolicy("AllowFrontend", policy =>
-	{
-		policy
-			.WithOrigins(allowedOrigins) 
-			.AllowAnyHeader()
-			.AllowAnyMethod();
-	});
+    var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+    opts.AddPolicy("AllowFrontend", p => p.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod());
 });
 
-// Add Redis configuration
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = "localhost:6379"; // Redis server address, replace with your Redis server URL if using cloud Redis
-    options.InstanceName = "AuthService:";
-});
-
-
-
-// Add Controllers
 builder.Services.AddControllers();
-
-// Add Swagger services
 builder.Services.AddSwaggerGen();
 
 if (builder.Environment.EnvironmentName == "Docker")
-{
-	builder.WebHost.UseUrls("http://*:80");
-}
+    builder.WebHost.UseUrls("http://*:80");
 
 var app = builder.Build();
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Service API V1");
+        c.RoutePrefix = "";
+    });
 }
 
-// Swagger Middleware
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Service API V1");
-    c.RoutePrefix = ""; // Optional: makes Swagger available at the root URL
-});
-
-// Use Routing (this needs to be called before UseAuthentication and UseAuthorization)
 app.UseRouting();
 app.UseCors("AllowFrontend");
+app.UseAuthentication();
+app.UseAuthorization();
 
-
-app.UseAuthentication();  // Authentication must come before Authorization
-app.UseAuthorization();   // Authorization must be after Authentication
-
-// Map Controllers
-app.UseEndpoints(endpoints =>
-{
-	endpoints.MapControllers();
-});
+app.MapControllers(); // simpler than UseEndpoints in .NET 8
 
 app.Run();
