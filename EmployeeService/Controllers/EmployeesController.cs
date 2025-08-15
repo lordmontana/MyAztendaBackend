@@ -25,16 +25,14 @@ public class EmployeesController : ControllerBase
     private readonly ILogger<EmployeesController> _logger;
     private readonly ApplicationDbContext _context;
     private readonly IUserInfoProvider _Admin;   // 
-    private readonly IRepository<Employee> _repo;
     private readonly MiniMediator _med;
 
 
-    public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context,IUserInfoProvider Admin, IRepository<Employee> repo,MiniMediator med)
+    public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context,IUserInfoProvider Admin,MiniMediator med)
     {
         _logger = logger;
         _context = context;
         _Admin = Admin;  
-        _repo = repo;
         _med = med;
     }
 
@@ -57,14 +55,11 @@ public class EmployeesController : ControllerBase
         => _med.SendAsync(new SearchEmployeesQuery(
                req.Page, req.PageSize, req.Mode, req.Filters ?? new()));
 
-
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
-
-        var repo = new Repository<Employee>(_context);
-        var item = await repo.GetByIdAsync(id);
-        return item is null ? NotFound() : Ok(item);
+        var dto = await _med.SendAsync(new GetEmployeeByIdQuery(id));
+        return dto is null ? NotFound() : Ok(dto);
     }
 
     [HttpPost]                                      

@@ -1,6 +1,9 @@
 back end 
 create an attribute for entites/ tables where the specific entity is not used logging/auditing
 
+location authorization not working. employee handerls are working . check the template at employee form
 
 front end 
 refactor popup to use the same components with generic list view 
+
+

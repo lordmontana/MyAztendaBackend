@@ -1,108 +1,55 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using LocationService.Application.Cqrs.Commands.LocationForm.CRUD;
+using LocationService.Application.Cqrs.Queries.LocationForm;
 using LocationService.DTOs;
-using Shared.Repositories;
-using Shared.Repositories.Persistence;
 using LocationService.Entities.Forms;
 using LocationService.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Shared.Admin.Interfaces;
+using Shared.Cqrs;
+using Shared.Dtos;
+using Shared.Repositories;
+using Shared.Repositories.Abstractions;
+using Shared.Repositories.Persistence;
 
 namespace LocationService.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class LocationsController : ControllerBase
 {
     private readonly ILogger<LocationsController> _logger;
     private readonly ApplicationDbContext _context;
+    private readonly IUserInfoProvider _Admin;   
+    private readonly MiniMediator _med;
 
-    public LocationsController(ILogger<LocationsController> logger, ApplicationDbContext context)
+    public LocationsController(ILogger<LocationsController> logger,  ApplicationDbContext context, IUserInfoProvider Admin, MiniMediator med)
     {
         _logger = logger;
         _context = context;
+		_Admin = Admin;
+		_med = med;
     }
 
+    /// <summary>Search employees with paging & dynamic filters.</summary>
+    [HttpPost("search")]
+    public Task<PagedResult<LocationDto>> SearchEmployees([FromBody] PagedRequest req)
+        => _med.SendAsync(new SearchLocationQuery(
+               req.Page, req.PageSize, req.Mode, req.Filters ?? new()));
 
-	[HttpGet]
-	public async Task<IActionResult> GetAll()
-	{
-		try
-		{
-			var repo = new Repository<Location>(_context);
-			var items = await repo.GetAllAsync();
-			return Ok(items);
-		}
-		catch (Exception ex)
-		{
-			// You can log here, too (e.g., to file, Grafana Loki, etc.)
-			return StatusCode(500, new
-			{
-				message = "An error occurred while retrieving data.",
-				error = ex.Message,        // Optional: return ex.StackTrace for full trace
-				type = ex.GetType().Name
-			});
-		}
-	}
-
-	[HttpGet("{id}")]
-	public async Task<IActionResult> GetById(int id)
-	{
-		
-		var repo = new Repository<Location>(_context);
-		var item = await repo.GetByIdAsync(id);
-		return item is null ? NotFound() : Ok(item);
-	}
-
-	[HttpPost]
-	public async Task<IActionResult> Create(CreateLocationDto dto)
-	{
-		
-		var repo = new Repository<Location>(_context);
-
-		var location = new Location
-		{
-			Name = dto.Name,
-			IId = dto.ClientId
-		};
-
-		await repo.AddAsync(location);
-		await repo.SaveChangesAsync();
-
-		return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
-	}
-
-	[HttpPut("{id}")]
-	public async Task<IActionResult> Update(int id, UpdateLocationDto dto)
-	{
-		
-		var repo = new Repository<Location>(_context);
-
-		var location = await repo.GetByIdAsync(id);
-		if (location is null) return NotFound();
-
-		if (!string.IsNullOrWhiteSpace(dto.Name)) location.Name = dto.Name;
-		if (dto.ClientId.HasValue) location.IId = dto.ClientId.Value;
-
-		repo.Update(location);
-		await repo.SaveChangesAsync();
-
-		return NoContent();
-	}
-
-	[HttpDelete("{id}")]
-	public async Task<IActionResult> Delete(int id)
-	{
-		
-		var repo = new Repository<Location>(_context);
-
-		var location = await repo.GetByIdAsync(id);
-		if (location is null) return NotFound();
-
-		repo.Delete(location);
-		await repo.SaveChangesAsync();
-
-		return NoContent();
-	}
+    [HttpPost]
+    public Task<int> Create([FromBody] LocationDto dto) => _med.SendAsync(new CreateLocationCommand(dto));
 
 
+    [HttpPut("{id:int}")]
+    public Task<int> Update(int id, [FromBody] LocationDto dto) =>
+    _med.SendAsync(new UpdateLocationCommand(id, dto));
+
+
+    [HttpDelete("{id:int}")]
+    public Task Delete(int id)
+    => _med.SendAsync(new DeleteLocationCommand(id));
 
 }
