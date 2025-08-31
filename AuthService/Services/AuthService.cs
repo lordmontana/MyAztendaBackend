@@ -1,32 +1,37 @@
 ﻿using System.Security.Claims;
+using System.Security.Cryptography;
 using AuthService.Models;
 using AuthService.Persistence;
 using AuthService.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 
 namespace AuthService.Services
 {
 	public class AuthService : IAuthService , IUserService, INotificationService
 	{
-		private readonly UserManager<ApplicationUser> _userManager;
-		private readonly SignInManager<ApplicationUser> _signInManager;
-		private readonly ITokenService _tokenService;
-		private readonly JwtSettingsModel _jwtSettings;
+                private readonly UserManager<ApplicationUser> _userManager;
+                private readonly SignInManager<ApplicationUser> _signInManager;
+                private readonly ITokenService _tokenService;
+                private readonly JwtSettingsModel _jwtSettings;
+                private readonly IDistributedCache _cache;
 
 		public AuthService(
-			UserManager<ApplicationUser> userManager,
-			SignInManager<ApplicationUser> signInManager,
-			ITokenService tokenService,
-			IOptions<JwtSettingsModel> jwtOptions)
+                        UserManager<ApplicationUser> userManager,
+                        SignInManager<ApplicationUser> signInManager,
+                        ITokenService tokenService,
+                        IOptions<JwtSettingsModel> jwtOptions,
+                        IDistributedCache cache)
 	
 		{
-			_userManager = userManager;
-			_signInManager = signInManager;
-			_tokenService = tokenService;
-			_jwtSettings = jwtOptions.Value;
+                        _userManager = userManager;
+                        _signInManager = signInManager;
+                        _tokenService = tokenService;
+                        _jwtSettings = jwtOptions.Value;
+                        _cache = cache;
 
-		}
+                }
 
 		public async Task<AuthResponse> LoginAsync(LoginModel request)
 		{
@@ -48,18 +53,12 @@ namespace AuthService.Services
 				};
 			}
 
-			var token = _tokenService.GenerateJwtToken(user);
+                        var token = _tokenService.GenerateJwtToken(user);
+                        var refreshToken = GenerateRefreshToken();
+                        await StoreRefreshTokenAsync(refreshToken, user.Id);
 
-			#region Enable When Redis Server Available
-			//var authService = new AuthService();
-			//// Store the session info in Redis
-
-			//authService.StoreJwtTokenInRedis(user.Id, token); 
-			// Store in Redis with an expiration time
-			#endregion
-
-			return CreateAuthResponse(user, token, request.Password);
-		}
+                        return CreateAuthResponse(user, token, refreshToken, request.Password);
+                }
 
 
 		public async Task<AuthResponse> RegisterAsync(RegisterModel request)
@@ -110,32 +109,77 @@ namespace AuthService.Services
 			// Optional: Sign in the user
 			await _signInManager.SignInAsync(user, isPersistent: false);
 
-			// Generate token
-			var token = _tokenService.GenerateJwtToken(user);
+                        // Generate token
+                        var token = _tokenService.GenerateJwtToken(user);
+                        var refreshToken = GenerateRefreshToken();
+                        await StoreRefreshTokenAsync(refreshToken, user.Id);
 
-			return CreateAuthResponse(user, token, request.Password);
+                        return CreateAuthResponse(user, token, refreshToken, request.Password);
 
 		}
-		private AuthResponse CreateAuthResponse(ApplicationUser user, string token, string? originalPassword = null)
-		{
-			return new AuthResponse
-			{
-				User = new UserDto(user),
-				Session = new SessionDto
-				{
-					AccessToken = token,
-					ExpiresIn = _jwtSettings.ExpireMinutes * 60,
-					CreatedAt = DateTime.UtcNow
-				},
-				WeakPassword = originalPassword != null && originalPassword.Length < 6
-		? "Password is weak"
-		: null
-			};
-		}
+                private AuthResponse CreateAuthResponse(ApplicationUser user, string token, string refreshToken, string? originalPassword = null)
+                {
+                        return new AuthResponse
+                        {
+                                User = new UserDto(user),
+                                Session = new SessionDto
+                                {
+                                        AccessToken = token,
+                                        RefreshToken = refreshToken,
+                                        ExpiresIn = _jwtSettings.ExpireMinutes * 60,
+                                        CreatedAt = DateTime.UtcNow
+                                },
+                                WeakPassword = originalPassword != null && originalPassword.Length < 6
+                ? "Password is weak"
+                : null
+                        };
+                }
 
-		// Other methods not implemented yet
-		public Task<AuthResponse> LogoutAsync(string userId) => throw new NotImplementedException();
-		public Task<AuthResponse> RefreshTokenAsync(string refreshToken) => throw new NotImplementedException();
+                private static string GenerateRefreshToken()
+                {
+                        var bytes = new byte[32];
+                        RandomNumberGenerator.Fill(bytes);
+                        return Convert.ToBase64String(bytes);
+                }
+
+                private async Task StoreRefreshTokenAsync(string refreshToken, string userId)
+                {
+                        var options = new DistributedCacheEntryOptions
+                        {
+                                AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7)
+                        };
+                        await _cache.SetStringAsync(refreshToken, userId, options);
+                }
+
+                // Other methods not implemented yet
+                public Task<AuthResponse> LogoutAsync(string userId) => throw new NotImplementedException();
+                public async Task<AuthResponse> RefreshTokenAsync(string refreshToken)
+                {
+                        var userId = await _cache.GetStringAsync(refreshToken);
+                        if (string.IsNullOrEmpty(userId))
+                        {
+                                return new AuthResponse
+                                {
+                                        Error = "Invalid refresh token."
+                                };
+                        }
+
+                        var user = await _userManager.FindByIdAsync(userId);
+                        if (user == null)
+                        {
+                                return new AuthResponse
+                                {
+                                        Error = "User not found."
+                                };
+                        }
+
+                        await _cache.RemoveAsync(refreshToken);
+                        var newToken = _tokenService.GenerateJwtToken(user);
+                        var newRefreshToken = GenerateRefreshToken();
+                        await StoreRefreshTokenAsync(newRefreshToken, user.Id);
+
+                        return CreateAuthResponse(user, newToken, newRefreshToken);
+                }
 		public Task<AuthResponse> GetUserAsync(string userId) => throw new NotImplementedException();
 		public Task<AuthResponse> UpdateUserAsync(string userId, LoginModel request) => throw new NotImplementedException();
 		public Task<AuthResponse> DeleteUserAsync(string userId) => throw new NotImplementedException();
