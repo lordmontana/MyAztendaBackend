@@ -23,31 +23,36 @@ namespace EmployeeService.Controllers;
 public class EmployeesController : ControllerBase
 {
     private readonly ILogger<EmployeesController> _logger;
-    private readonly ApplicationDbContext _context;
-    private readonly IUserInfoProvider _Admin;   // 
+  //  private readonly ApplicationDbContext _context;
+   // private readonly IUserInfoProvider _Admin;   // 
     private readonly MiniMediator _med;
 
 
-    public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context,IUserInfoProvider Admin,MiniMediator med)
+    public EmployeesController(ILogger<EmployeesController> logger,MiniMediator med)
     {
         _logger = logger;
-        _context = context;
-        _Admin = Admin;  
         _med = med;
     }
 
+   //public EmployeesController(ILogger<EmployeesController> logger, ApplicationDbContext context, IUserInfoProvider Admin, MiniMediator med)
+   //{
+   //    _logger = logger;
+   //    _context = context;
+   //    _Admin = Admin;
+   //    _med = med;
+   //}
 
 
-   // [HttpGet]//SearchEmployees does the same. we will never give this endpoint to frontend. Only with pagination etc
-   // public async Task<IActionResult> GetAll()
-   // {
-   //  
-	//		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-	//		var repo = new Repository<Employee>(_context);
-	//		var items = await repo.GetAllAsync();
-	//		return Ok(items);
-   //
-   // }
+    // [HttpGet]//SearchEmployees does the same. we will never give this endpoint to frontend. Only with pagination etc
+    // public async Task<IActionResult> GetAll()
+    // {
+    //  
+    //		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    //		var repo = new Repository<Employee>(_context);
+    //		var items = await repo.GetAllAsync();
+    //		return Ok(items);
+    //
+    // }
 
     /// <summary>Search employees with paging & dynamic filters.</summary>
     [HttpPost("search")]
