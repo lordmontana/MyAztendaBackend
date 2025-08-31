@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Security.Claims;
 using AuthService.Models;
 using AuthService.Persistence;
 using AuthService.Services.Interfaces;
@@ -48,7 +49,8 @@ namespace AuthService.Services
 				};
 			}
 
-			var token = _tokenService.GenerateJwtToken(user);
+                        var token = _tokenService.GenerateJwtToken(user);
+                        var refreshToken = _tokenService.GenerateRefreshToken(user);
 
 			#region Enable When Redis Server Available
 			//var authService = new AuthService();
@@ -58,7 +60,7 @@ namespace AuthService.Services
 			// Store in Redis with an expiration time
 			#endregion
 
-			return CreateAuthResponse(user, token, request.Password);
+                        return CreateAuthResponse(user, token, refreshToken, request.Password);
 		}
 
 
@@ -110,32 +112,73 @@ namespace AuthService.Services
 			// Optional: Sign in the user
 			await _signInManager.SignInAsync(user, isPersistent: false);
 
-			// Generate token
-			var token = _tokenService.GenerateJwtToken(user);
+                        // Generate tokens
+                        var token = _tokenService.GenerateJwtToken(user);
+                        var refreshToken = _tokenService.GenerateRefreshToken(user);
 
-			return CreateAuthResponse(user, token, request.Password);
+                        return CreateAuthResponse(user, token, refreshToken, request.Password);
 
 		}
-		private AuthResponse CreateAuthResponse(ApplicationUser user, string token, string? originalPassword = null)
-		{
-			return new AuthResponse
-			{
-				User = new UserDto(user),
-				Session = new SessionDto
-				{
-					AccessToken = token,
-					ExpiresIn = _jwtSettings.ExpireMinutes * 60,
-					CreatedAt = DateTime.UtcNow
-				},
-				WeakPassword = originalPassword != null && originalPassword.Length < 6
-		? "Password is weak"
-		: null
-			};
-		}
+                private AuthResponse CreateAuthResponse(ApplicationUser user, string token, string refreshToken, string? originalPassword = null)
+                {
+                        return new AuthResponse
+                        {
+                                User = new UserDto(user),
+                                Session = new SessionDto
+                                {
+                                        AccessToken = token,
+                                        RefreshToken = refreshToken,
+                                        ExpiresIn = _jwtSettings.ExpireMinutes * 60,
+                                        CreatedAt = DateTime.UtcNow
+                                },
+                                WeakPassword = originalPassword != null && originalPassword.Length < 6
+                ? "Password is weak"
+                : null
+                        };
+                }
 
 		// Other methods not implemented yet
-		public Task<AuthResponse> LogoutAsync(string userId) => throw new NotImplementedException();
-		public Task<AuthResponse> RefreshTokenAsync(string refreshToken) => throw new NotImplementedException();
+                public Task<AuthResponse> LogoutAsync(string userId) => throw new NotImplementedException();
+                public async Task<AuthResponse> RefreshTokenAsync(string refreshToken)
+                {
+                        var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                        try
+                        {
+                                var validationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                                {
+                                        ValidateIssuer = true,
+                                        ValidateAudience = true,
+                                        ValidateIssuerSigningKey = true,
+                                        ValidateLifetime = true,
+                                        ClockSkew = TimeSpan.Zero,
+                                        ValidIssuer = _jwtSettings.Issuer,
+                                        ValidAudience = _jwtSettings.Audience,
+                                        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Convert.FromBase64String(_jwtSettings.SecretKey))
+                                };
+
+                                var principal = tokenHandler.ValidateToken(refreshToken, validationParameters, out _);
+                                var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                                if (string.IsNullOrEmpty(userId))
+                                {
+                                        return new AuthResponse { Error = "Invalid refresh token." };
+                                }
+
+                                var user = await _userManager.FindByIdAsync(userId);
+                                if (user == null)
+                                {
+                                        return new AuthResponse { Error = "User not found." };
+                                }
+
+                                var newToken = _tokenService.GenerateJwtToken(user);
+                                var newRefreshToken = _tokenService.GenerateRefreshToken(user);
+
+                                return CreateAuthResponse(user, newToken, newRefreshToken);
+                        }
+                        catch (Exception)
+                        {
+                                return new AuthResponse { Error = "Invalid refresh token." };
+                        }
+                }
 		public Task<AuthResponse> GetUserAsync(string userId) => throw new NotImplementedException();
 		public Task<AuthResponse> UpdateUserAsync(string userId, LoginModel request) => throw new NotImplementedException();
 		public Task<AuthResponse> DeleteUserAsync(string userId) => throw new NotImplementedException();

@@ -8,10 +8,11 @@ using System.Text;
 
 namespace AuthService.Services
 {
-	public interface ITokenService
-	{
-		string GenerateJwtToken(ApplicationUser user);
-	}
+        public interface ITokenService
+        {
+                string GenerateJwtToken(ApplicationUser user);
+                string GenerateRefreshToken(ApplicationUser user);
+        }
 
 	public class TokenService : ITokenService
 	{
@@ -22,8 +23,8 @@ namespace AuthService.Services
 			_jwtSettings = jwtOptions.Value;
 		}
 
-		public string GenerateJwtToken(ApplicationUser user)
-		{
+                public string GenerateJwtToken(ApplicationUser user)
+                {
 			var claims = new[]
 			{
 				new Claim(JwtRegisteredClaimNames.Sub, user.Id),
@@ -45,7 +46,30 @@ namespace AuthService.Services
 				signingCredentials: creds
 			);
 
-			return new JwtSecurityTokenHandler().WriteToken(token);
-		}
-	}
+                        return new JwtSecurityTokenHandler().WriteToken(token);
+                }
+
+                public string GenerateRefreshToken(ApplicationUser user)
+                {
+                        var claims = new[]
+                        {
+                                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                                new Claim(ClaimTypes.NameIdentifier, user.Id)
+                        };
+
+                        var key = new SymmetricSecurityKey(Convert.FromBase64String(_jwtSettings.SecretKey));
+                        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                        var token = new JwtSecurityToken(
+                                issuer: _jwtSettings.Issuer,
+                                audience: _jwtSettings.Audience,
+                                claims: claims,
+                                expires: DateTime.UtcNow.AddDays(7),
+                                signingCredentials: creds
+                        );
+
+                        return new JwtSecurityTokenHandler().WriteToken(token);
+                }
+        }
 }

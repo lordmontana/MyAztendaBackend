@@ -44,15 +44,24 @@ namespace AuthService.Controllers
 			return Ok(response);
 		}
 
-		// Login endpoint
-		[HttpPost("login")]
-		public async Task<IActionResult> Login([FromBody] LoginModel request)
-		{
-			var response = await _authService.LoginAsync(request);
-			if (response.Error != null) return Unauthorized(response);
-			return Ok(response);
-		
-		}
+                // Login endpoint
+                [HttpPost("login")]
+                public async Task<IActionResult> Login([FromBody] LoginModel request)
+                {
+                        var response = await _authService.LoginAsync(request);
+                        if (response.Error != null) return Unauthorized(response);
+                        return Ok(response);
+
+                }
+
+                // Refresh token endpoint
+                [HttpPost("refresh")]
+                public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
+                {
+                        var response = await _authService.RefreshTokenAsync(request.RefreshToken);
+                        if (response.Error != null) return Unauthorized(response);
+                        return Ok(response);
+                }
        
 
     }
