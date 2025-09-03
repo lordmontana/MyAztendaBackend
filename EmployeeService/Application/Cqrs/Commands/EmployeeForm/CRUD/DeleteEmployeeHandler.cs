@@ -1,4 +1,4 @@
-﻿using EmployeeService.Entities.Forms;
+﻿using EmployeeService.Domain.Entities.Forms;
 using Shared.Cqrs.Bases;
 using Shared.Repositories.Abstractions;
 namespace EmployeeService.Application.Cqrs.Commands.EmployeeForm.CRUD;

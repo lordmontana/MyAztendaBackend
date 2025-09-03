@@ -1,12 +1,12 @@
-﻿using EmployeeService.Application.Cqrs.Queries.EmployeeForm;
-using EmployeeService.DTOs;
-using EmployeeService.Entities.Forms;
+﻿using EmployeeService.Application.Cqrs.Queries.TimeTableForm;
+using EmployeeService.Application.DTOs;
+using EmployeeService.Domain.Entities.Forms;
 using Shared.Cqrs.Abstractions;
 using Shared.Dtos;
 using Shared.Filtering;
 using Shared.Repositories.Abstractions;
 
-namespace EmployeeService.Cqrs.Queries;
+namespace EmployeeService.Application.Cqrs.Queries.TimeTableForm;
 public sealed class SearchCreateTimeTableHandler(
     IRepository<Employee> repo)
     : IQueryHandler<SearchCreateTimeTableQuery, PagedResult<EmployeeDto>>

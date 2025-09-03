@@ -1,5 +1,5 @@
 ﻿// UpdateEmployeeCommand.cs
-using EmployeeService.DTOs;
+using EmployeeService.Application.DTOs;
 using Shared.Cqrs.Abstractions;
 
 namespace EmployeeService.Application.Cqrs.Commands.EmployeeForm.CRUD;

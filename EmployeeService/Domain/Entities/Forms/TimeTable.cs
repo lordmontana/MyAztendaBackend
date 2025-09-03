@@ -1,6 +1,6 @@
 ﻿using Shared.Entities;
 
-namespace EmployeeService.Entities.Forms
+namespace EmployeeService.Domain.Entities.Forms
 {
     public class TimeTable : BaseEntity
     {

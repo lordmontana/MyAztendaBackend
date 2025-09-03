@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using EmployeeService.Services;
+using EmployeeService.Infrastructure.Services;
 using EmployeeLocationService;
 
-namespace EmployeeService.Controllers
+namespace EmployeeService.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

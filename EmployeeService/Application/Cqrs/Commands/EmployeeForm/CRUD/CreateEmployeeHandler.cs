@@ -1,6 +1,6 @@
 ﻿
-using EmployeeService.Entities.Forms;
-using EmployeeService.Persistence;
+using EmployeeService.Domain.Entities.Forms;
+using EmployeeService.Infrastructure.Persistence;
 using Shared.Repositories.Abstractions;
 
 namespace EmployeeService.Application.Cqrs.Commands.EmployeeForm.CRUD;

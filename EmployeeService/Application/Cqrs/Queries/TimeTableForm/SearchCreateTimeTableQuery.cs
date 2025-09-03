@@ -1,8 +1,8 @@
-﻿using EmployeeService.DTOs;
+﻿using EmployeeService.Application.DTOs;
 using Shared.Cqrs.Abstractions;
 using Shared.Dtos;
 
-namespace EmployeeService.Application.Cqrs.Queries.EmployeeForm
+namespace EmployeeService.Application.Cqrs.Queries.TimeTableForm
 {
     public sealed record SearchCreateTimeTableQuery(
        int Page,

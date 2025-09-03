@@ -2,7 +2,7 @@
 using Grpc.Net.Client;
 using static EmployeeLocationService.EmployeeLocationGRPC;
 
-namespace EmployeeService.Services
+namespace EmployeeService.Infrastructure.Services
 {
     public class EmployeeGRPCClientService
     {

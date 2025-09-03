@@ -1,5 +1,5 @@
-﻿using EmployeeService.DTOs;
-using EmployeeService.Entities.Forms;
+﻿using EmployeeService.Application.DTOs;
+using EmployeeService.Domain.Entities.Forms;
 using Shared.Cqrs.Abstractions;
 using Shared.Cqrs.Bases;
 using Shared.Dtos;

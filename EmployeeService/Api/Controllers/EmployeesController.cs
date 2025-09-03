@@ -1,6 +1,4 @@
-using EmployeeService.DTOs;
-using EmployeeService.Entities.Forms;
-using EmployeeService.Persistence;
+using EmployeeService.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Admin.Interfaces;
@@ -15,7 +13,7 @@ using EmployeeService.Application.Cqrs.Queries.EmployeeForm;
 
 
 
-namespace EmployeeService.Controllers;
+namespace EmployeeService.Api.Controllers;
 
 [Authorize] 
 [ApiController]

@@ -1,6 +1,6 @@
 ﻿
-using EmployeeService.Entities.Forms;
-using EmployeeService.Persistence;
+using EmployeeService.Domain.Entities.Forms;
+using EmployeeService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Shared.Cqrs.Bases;
 using Shared.Repositories.Abstractions;

@@ -1,7 +1,7 @@
 ﻿// Application/Cqrs/Commands/EmployeeForm/EmployeeSaveHandler.cs
 using EmployeeService.Application.Cqrs.Commands.EmployeeForm.CRUD;
-using EmployeeService.Entities.Forms;
-using EmployeeService.Persistence;
+using EmployeeService.Domain.Entities.Forms;
+using EmployeeService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Shared.Cqrs.Abstractions;
 using Shared.Cqrs.Bases;

@@ -1,9 +1,9 @@
-﻿using EmployeeService.Application.Cqrs.Commands.EmployeeForm;
-using EmployeeService.Entities.Forms;    // Employee entity namespace
+﻿using EmployeeService.Application.Cqrs.Commands.TimeTableForm;
+using EmployeeService.Domain.Entities.Forms;    // Employee entity namespace
 using Shared.Cqrs.Abstractions;
 using Shared.Repositories.Abstractions;
 
-namespace EmployeeService.Cqrs.Commands;
+namespace EmployeeService.Application.Cqrs.Commands.TimeTableForm;
 public sealed class CreateTimeTableHandler(IRepository<Employee> repo)
     : ICommandHandler<CreateTimeTableCommand, int>
 {

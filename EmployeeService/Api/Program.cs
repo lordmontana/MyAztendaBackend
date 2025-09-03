@@ -1,8 +1,7 @@
 ﻿using EmployeeService.Application.Cqrs.Commands.EmployeeForm.CRUD;
-using EmployeeService.Cqrs.Commands;  // marker type
-using EmployeeService.Persistence;
-using EmployeeService.Services;
-using EmployeeService.Settings;
+using EmployeeService.Infrastructure.Persistence;
+using EmployeeService.Infrastructure.Services;
+using EmployeeService.Api.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

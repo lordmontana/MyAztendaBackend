@@ -1,4 +1,4 @@
-﻿using EmployeeService.Entities.Forms;           // for IHasInstallation
+﻿using EmployeeService.Domain.Entities.Forms;           // for IHasInstallation
 using Microsoft.EntityFrameworkCore;
 using Shared.Admin.Interfaces;     // ← IUserInfoProvider
 using Shared.Entities;
@@ -7,7 +7,7 @@ using Shared.Logging.Interceptors;
 using Shared.Persistence;
 using System.Linq.Expressions;
 
-namespace EmployeeService.Persistence
+namespace EmployeeService.Infrastructure.Persistence
 {
     public class ApplicationDbContext :BaseDbContext<ApplicationDbContext>
     {
