@@ -1,7 +1,7 @@
 ## Design Patterns Used
 
 ### GoF / Object-Oriented Patterns
-1. [Repository Pattern](./Shared/Repositories/Abstractions/IRepository.cs) – generic `IRepository<T>` abstraction with concrete `Repository<T>` to encapsulate persistence operations ([Infrastructure](./src/Infrastructure/Repositories))
+1. [Repository Pattern](./Shared/Repositories/Abstractions/IRepository.cs) – generic `IRepository<T>` abstraction with concrete `Repository<T>` to encapsulate persistence operations
 2. [Factory](./Shared/Filtering/ParserFactory.cs) – `ParserFactory.Get<TEntity>(mode)` decides at runtime which parser implementation to return
 3. [Strategy](./Shared/Filtering/IFilterParser.cs) – `IFilterParser<TEntity>` with `AdvancedFilterParser<TEntity>` vs. `SimpleFilterParser<TEntity>`
 4. [Decorator](./Shared/Cqrs/Decorators/LoggingCommandDecorator.cs) – cross-cutting concerns (logging, validation) wrapped around handlers
