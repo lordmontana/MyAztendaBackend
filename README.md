@@ -1,5 +1,5 @@
 # MyAztendaBackend
-Design patterns used (.Shared/Repositories/Abstractions/IRepository.cs)
+Design patterns used [Repository Pattern](.Shared/Repositories/Abstractions/IRepository.cs)
 1.Repository pattern – generic IRepository<T> abstraction with concrete Repository<T> to encapsulate persistence operations (./src/Infrastructure/Repositories)
 2. CQRS + Template Method – base CreateEntityHandler defines the command workflow and defers customization to overridable steps, enabling separate command/query handlers   
 3.Mediator pattern – MiniMediator routes commands and queries to their handlers through dependency injection
