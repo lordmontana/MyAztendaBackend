@@ -25,9 +25,11 @@
 
 ##  TODO 
 
-- [ ] Change naming of services to proper generic (e.g., `EmployeeService` → `UserService` where applicable)
+- [ ] Change naming of services to proper generic (e.g., `EmployeeService` → `HumanResources` where applicable)
 - [ ] Review [`Shared/Filtering/SimpleFilterParser.cs`](./Shared/Filtering/SimpleFilterParser.cs) for compatibility with PostgreSQL; add support for both SQL Server and PostgreSQL
 - [ ] Refactor services (starting with EmployeeService) to follow Clean Architecture principles
 - [ ] Create an attribute for entities/tables that should be excluded from logging/auditing
 - [ ] Add metrics to API Gateway (integrate with Prometheus/Grafana)
 - [ ] Implement event-driven architecture in NotificationService and add a consumer (e.g., user validation event)
+- [ ] Review and add documentation (XML docs / comments) throughout the **Shared** library for better maintainability
+- [ ] Implement all `NotImplementedException` methods in the **AuthService**
